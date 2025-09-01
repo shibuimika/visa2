@@ -1,0 +1,74 @@
+{
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "languageSelect": "Please select your language"
+  },
+  "survey": {
+    "title": "Basic Information Survey",
+    "description": "Please answer the following questions to create a customized application flow for your situation.",
+    "visaType": "Please select your visa type",
+    "procedureType": "Please select the type of procedure",
+    "familyRelation": "Please select your family relationship",
+    "workStatus": "Work/School status (optional)"
+  },
+  "requirements": {
+    "title": "Requirements Check",
+    "description": "Please verify that you have all the necessary items for your application.",
+    "systemTitle": "System Requirements (Required for All)",
+    "documentsTitle": "Required Documents",
+    "allComplete": "All preparations are complete",
+    "proceedToForm": "Proceed to Application Form"
+  },
+  "form": {
+    "basicInfo": {
+      "title": "Basic Information",
+      "nameEn": "Name (English)",
+      "nameJa": "Name (Japanese)",
+      "nationality": "Nationality",
+      "birthDate": "Date of Birth",
+      "address": "Address",
+      "phone": "Phone Number",
+      "email": "Email Address"
+    },
+    "passport": {
+      "title": "Passport Information",
+      "passportNumber": "Passport Number",
+      "issueDate": "Issue Date",
+      "expiryDate": "Expiry Date",
+      "issueCountry": "Country of Issue"
+    },
+    "residenceCard": {
+      "title": "Residence Card Information",
+      "cardNumber": "Residence Card Number",
+      "expiryDate": "Expiry Date",
+      "currentVisa": "Current Visa Status"
+    }
+  },
+  "confirmation": {
+    "title": "Application Confirmation",
+    "description": "Please review your application details. Use the edit buttons to make changes to each section."
+  },
+  "completion": {
+    "title": "Application Complete",
+    "description": "Your application form has been successfully generated.",
+    "downloadPdf": "Download PDF Application",
+    "submissionGuide": "Submission Guide for Immigration Services Agency"
+  }
+}

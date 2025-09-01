@@ -1,0 +1,74 @@
+{
+  "common": {
+    "next": "下一步",
+    "back": "返回",
+    "submit": "提交",
+    "cancel": "取消",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "confirm": "确认",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "成功"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "email": "电子邮件地址",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "languageSelect": "请选择您的语言"
+  },
+  "survey": {
+    "title": "基本信息调查",
+    "description": "请回答以下问题，以便为您的情况创建定制的申请流程。",
+    "visaType": "请选择您的签证类型",
+    "procedureType": "请选择手续类型",
+    "familyRelation": "请选择家庭关系",
+    "workStatus": "工作/学校状况（可选）"
+  },
+  "requirements": {
+    "title": "准备物品检查",
+    "description": "请确认您已准备好申请所需的所有物品。",
+    "systemTitle": "系统要求（所有人必需）",
+    "documentsTitle": "必需文件",
+    "allComplete": "所有准备工作已完成",
+    "proceedToForm": "进入申请表格"
+  },
+  "form": {
+    "basicInfo": {
+      "title": "基本信息",
+      "nameEn": "姓名（英文）",
+      "nameJa": "姓名（日文）",
+      "nationality": "国籍",
+      "birthDate": "出生日期",
+      "address": "地址",
+      "phone": "电话号码",
+      "email": "电子邮件地址"
+    },
+    "passport": {
+      "title": "护照信息",
+      "passportNumber": "护照号码",
+      "issueDate": "发行日期",
+      "expiryDate": "到期日期",
+      "issueCountry": "发行国"
+    },
+    "residenceCard": {
+      "title": "在留卡信息",
+      "cardNumber": "在留卡号码",
+      "expiryDate": "到期日期",
+      "currentVisa": "当前签证状态"
+    }
+  },
+  "confirmation": {
+    "title": "申请确认",
+    "description": "请检查您的申请详情。使用编辑按钮修改各个部分。"
+  },
+  "completion": {
+    "title": "申请完成",
+    "description": "您的申请表格已成功生成。",
+    "downloadPdf": "下载PDF申请表",
+    "submissionGuide": "入国管理局提交指南"
+  }
+}

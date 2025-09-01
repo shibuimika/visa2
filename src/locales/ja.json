@@ -1,0 +1,74 @@
+{
+  "common": {
+    "next": "次へ",
+    "back": "戻る",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "edit": "編集",
+    "delete": "削除",
+    "confirm": "確認",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "成功しました"
+  },
+  "auth": {
+    "login": "ログイン",
+    "register": "新規登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "languageSelect": "言語を選択してください"
+  },
+  "survey": {
+    "title": "基本情報アンケート",
+    "description": "あなたの状況に合わせた申請フローを作成するため、以下の質問にお答えください。",
+    "visaType": "在留資格を選択してください",
+    "procedureType": "手続きの種類を選択してください", 
+    "familyRelation": "家族滞在の関係性を選択してください",
+    "workStatus": "勤務先・学校の状況（任意）"
+  },
+  "requirements": {
+    "title": "準備物チェック",
+    "description": "申請に必要な準備物を確認してください。",
+    "systemTitle": "システム環境（全員必須）",
+    "documentsTitle": "必要書類",
+    "allComplete": "全ての準備が完了しました",
+    "proceedToForm": "入力フォームへ進む"
+  },
+  "form": {
+    "basicInfo": {
+      "title": "基本情報",
+      "nameEn": "氏名（英語）",
+      "nameJa": "氏名（日本語）",
+      "nationality": "国籍",
+      "birthDate": "生年月日",
+      "address": "住所",
+      "phone": "電話番号",
+      "email": "メールアドレス"
+    },
+    "passport": {
+      "title": "パスポート情報",
+      "passportNumber": "パスポート番号",
+      "issueDate": "発行日",
+      "expiryDate": "有効期限",
+      "issueCountry": "発行国"
+    },
+    "residenceCard": {
+      "title": "在留カード情報",
+      "cardNumber": "在留カード番号",
+      "expiryDate": "有効期限",
+      "currentVisa": "現在の在留資格"
+    }
+  },
+  "confirmation": {
+    "title": "申請内容確認",
+    "description": "入力内容を確認してください。修正する場合は各セクションの編集ボタンを押してください。"
+  },
+  "completion": {
+    "title": "申請完了",
+    "description": "申請書が正常に生成されました。",
+    "downloadPdf": "PDF申請書をダウンロード",
+    "submissionGuide": "出入国在留管理庁への提出手順"
+  }
+}

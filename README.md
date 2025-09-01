@@ -1,46 +1,93 @@
-# Getting Started with Create React App
+# VISAオンライン申請サービス
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+在日外国人が「在留資格（技人国・特定技能・留学・家族滞在）」に関する申請を、**完全オンラインで簡便かつ安心して行えるWebサービス**です。
 
-## Available Scripts
+## 特徴
 
-In the project directory, you can run:
+- **数問アンケート→自分専用フロー生成**: 4問のアンケートで自動的に申請フローを分岐
+- **準備物が明確**: システム環境と書類の準備物チェックリスト
+- **必要な入力のみ表示**: 迷わずに必要書類と入力項目を揃えられる
+- **即時バリデーション**: リアルタイムでの入力チェック
+- **PDFとオンライン提出**: 申請完了まで一気通貫
 
-### `npm start`
+## 対応在留資格
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- 技術・人文知識・国際業務（技人国）
+- 特定技能1号
+- 特定技能2号
+- 留学
+- 家族滞在
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 対応手続き
 
-### `npm test`
+- 更新
+- 変更
+- 取得
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 技術スタック
 
-### `npm run build`
+- **Frontend**: React 19 + TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: Zustand
+- **Form Management**: React Hook Form + Zod
+- **Routing**: React Router v6
+- **Internationalization**: react-i18next
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 開発環境セットアップ
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 必要条件
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- Node.js 18以上
+- npm
 
-### `npm run eject`
+### インストール
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+# 依存関係のインストール
+npm install
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# 開発サーバーの起動
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 利用可能なスクリプト
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- `npm start`: 開発サーバーを起動（http://localhost:3000）
+- `npm run build`: 本番用ビルドを作成
+- `npm test`: テストを実行
 
-## Learn More
+## デプロイ
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+このプロジェクトはNetlifyでのデプロイに対応しています。
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Netlify設定
+
+- **Build command**: `npm run build`
+- **Publish directory**: `build`
+- **Node version**: 18
+
+## プロジェクト構造
+
+```
+src/
+├── components/          # Reactコンポーネント
+│   ├── auth/           # 認証関連
+│   ├── common/         # 共通コンポーネント
+│   ├── confirmation/   # 確認画面
+│   ├── completion/     # 完了画面
+│   ├── forms/          # フォーム関連
+│   │   ├── conditional/ # 条件付きフォーム
+│   │   └── ...
+│   ├── survey/         # アンケート
+│   └── checklist/      # 準備物チェック
+├── pages/              # ページコンポーネント
+├── stores/             # Zustandストア
+├── types/              # TypeScript型定義
+├── utils/              # ユーティリティ関数
+├── constants/          # 定数
+└── locales/            # 多言語対応
+```
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
