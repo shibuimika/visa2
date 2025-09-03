@@ -114,6 +114,8 @@ const FormContainer: React.FC = () => {
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+      // ステップ変更時にスクロール位置をリセット
+      setTimeout(() => window.scrollTo(0, 0), 0);
     } else {
       // 全てのステップが完了したら確認画面へ
       navigate('/confirmation');
@@ -123,6 +125,8 @@ const FormContainer: React.FC = () => {
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      // ステップ変更時にスクロール位置をリセット
+      setTimeout(() => window.scrollTo(0, 0), 0);
     } else {
       // 最初のステップの場合は準備物チェックページに戻る
       navigate('/requirements');

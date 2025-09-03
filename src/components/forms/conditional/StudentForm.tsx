@@ -204,18 +204,20 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{getFormTitle()}</h2>
-        <p className="text-gray-600">
+    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          {getFormTitle()}
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600">
           留学の在留資格に関する情報を入力してください。
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {renderFormFields()}
+            {renderFormFields()}
 
-        <div className="flex justify-between pt-6">
+        <div className="flex justify-between pt-6 border-t">
           <button
             type="button"
             onClick={onBack}
@@ -223,7 +225,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
           >
             戻る
           </button>
-          
+
           <button
             type="submit"
             className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

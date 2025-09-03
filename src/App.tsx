@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/common/Layout';
 import { useAppStore } from './stores/appStore';
 import './utils/i18n'; // i18n初期化
@@ -12,78 +12,100 @@ import FormPage from './pages/FormPage';
 import ConfirmationPage from './pages/ConfirmationPage';
 import CompletionPage from './pages/CompletionPage';
 
-function App() {
+// ページ遷移時にスクロール位置をリセットするコンポーネント
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    // ページ遷移時に必ずトップにスクロール
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+// AppContentコンポーネント（Router内でuseLocationを使用するため）
+function AppContent() {
   const { user } = useAppStore();
 
   return (
-    <Router>
+    <>
+      <ScrollToTop />
       <div className="App">
         <Routes>
           {/* 未認証の場合は登録ページにリダイレクト */}
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
-              user ? 
-                <Navigate to="/survey" replace /> : 
+              user ?
+                <Navigate to="/survey" replace /> :
                 <Navigate to="/register" replace />
-            } 
+            }
           />
-          
-          <Route 
-            path="/register" 
+
+          <Route
+            path="/register"
             element={
               <Layout showHeader={true} showProgress={false}>
                 <RegistrationPage />
               </Layout>
-            } 
+            }
           />
-          
-          <Route 
-            path="/survey" 
+
+          <Route
+            path="/survey"
             element={
               <Layout showHeader={true} showProgress={true} currentStep={1} totalSteps={6}>
                 <SurveyPage />
               </Layout>
-            } 
+            }
           />
-          
-          <Route 
-            path="/requirements" 
+
+          <Route
+            path="/requirements"
             element={
               <Layout showHeader={true} showProgress={true} currentStep={2} totalSteps={6}>
                 <RequirementsPage />
               </Layout>
-            } 
+            }
           />
-          
-          <Route 
-            path="/form" 
+
+          <Route
+            path="/form"
             element={
               <Layout showHeader={true} showProgress={true} currentStep={3} totalSteps={6}>
                 <FormPage />
               </Layout>
-            } 
+            }
           />
-          
-          <Route 
-            path="/confirmation" 
+
+          <Route
+            path="/confirmation"
             element={
               <Layout showHeader={true} showProgress={true} currentStep={4} totalSteps={6}>
                 <ConfirmationPage />
               </Layout>
-            } 
+            }
           />
-          
-          <Route 
-            path="/completion" 
+
+          <Route
+            path="/completion"
             element={
               <Layout showHeader={true} showProgress={true} currentStep={5} totalSteps={6}>
                 <CompletionPage />
               </Layout>
-            } 
+            }
           />
         </Routes>
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
