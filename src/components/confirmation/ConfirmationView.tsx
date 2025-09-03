@@ -99,8 +99,18 @@ const ConfirmationView: React.FC = () => {
       <InfoSection title="基本情報" onEdit={() => handleEdit('basic')}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <DataRow label="氏名（英語）" value={formData.basicInfo?.nameEn} />
-            <DataRow label="氏名（日本語）" value={formData.basicInfo?.nameJa} />
+            <DataRow
+              label="氏名（英語）"
+              value={formData.basicInfo?.lastNameEn && formData.basicInfo?.firstNameEn
+                ? `${formData.basicInfo.lastNameEn} ${formData.basicInfo.firstNameEn}`
+                : ''}
+            />
+            <DataRow
+              label="氏名（日本語）"
+              value={formData.basicInfo?.lastNameJa && formData.basicInfo?.firstNameJa
+                ? `${formData.basicInfo.lastNameJa} ${formData.basicInfo.firstNameJa}`
+                : ''}
+            />
             <DataRow label="国籍" value={formData.basicInfo?.nationality} />
             <DataRow label="生年月日" value={formData.basicInfo?.birthDate} />
           </div>
@@ -110,13 +120,29 @@ const ConfirmationView: React.FC = () => {
           </div>
         </div>
         <div className="mt-4">
-          <div className="flex justify-between items-center py-3 px-4 bg-gray-50/50 rounded-lg border border-gray-100 hover:bg-gray-100/50 transition-colors duration-150">
-            <span className="text-sm sm:text-base font-medium text-gray-700">住所:</span>
-            <span className={`text-sm sm:text-base font-semibold ${
-              formData.basicInfo?.address && formData.basicInfo.address !== '未入力' ? 'text-gray-900' : 'text-gray-400 italic'
-            }`}>
-              {formData.basicInfo?.address || '未入力'}
-            </span>
+          <div className="flex justify-between items-start py-3 px-4 bg-gray-50/50 rounded-lg border border-gray-100 hover:bg-gray-100/50 transition-colors duration-150">
+            <span className="text-sm sm:text-base font-medium text-gray-700 mt-1">住所:</span>
+            <div className="flex-1 ml-4 text-right">
+              {(() => {
+                const addressParts = [
+                  formData.basicInfo?.postalCode && `〒${formData.basicInfo.postalCode}`,
+                  formData.basicInfo?.country,
+                  formData.basicInfo?.prefecture,
+                  formData.basicInfo?.city,
+                  formData.basicInfo?.street,
+                  formData.basicInfo?.building
+                ].filter(Boolean);
+
+                const fullAddress = addressParts.join(' ');
+                return (
+                  <span className={`text-sm sm:text-base font-semibold ${
+                    fullAddress ? 'text-gray-900' : 'text-gray-400 italic'
+                  }`}>
+                    {fullAddress || '未入力'}
+                  </span>
+                );
+              })()}
+            </div>
           </div>
         </div>
       </InfoSection>

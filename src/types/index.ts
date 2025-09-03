@@ -41,11 +41,18 @@ export interface RequirementList {
 
 // フォームデータの基本情報
 export interface BasicInfo {
-  nameEn: string;
-  nameJa: string;
+  lastNameEn: string;
+  firstNameEn: string;
+  lastNameJa: string;
+  firstNameJa: string;
   nationality: string;
   birthDate: string;
-  address: string;
+  postalCode: string;
+  country: string;
+  prefecture: string;
+  city: string;
+  street: string;
+  building: string;
   phone: string;
   email: string;
 }

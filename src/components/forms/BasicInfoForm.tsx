@@ -6,11 +6,18 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../stores/appStore';
 
 const basicInfoSchema = z.object({
-  nameEn: z.string().min(1, '英語名は必須です'),
-  nameJa: z.string().min(1, '日本語名は必須です'),
+  lastNameEn: z.string().min(1, '英語姓は必須です'),
+  firstNameEn: z.string().min(1, '英語名は必須です'),
+  lastNameJa: z.string().min(1, '日本語姓は必須です'),
+  firstNameJa: z.string().min(1, '日本語名は必須です'),
   nationality: z.string().min(1, '国籍は必須です'),
   birthDate: z.string().min(1, '生年月日は必須です'),
-  address: z.string().min(1, '住所は必須です'),
+  postalCode: z.string().min(1, '郵便番号は必須です'),
+  country: z.string().min(1, '国は必須です'),
+  prefecture: z.string().min(1, '都道府県は必須です'),
+  city: z.string().min(1, '市区町村は必須です'),
+  street: z.string().min(1, '番地は必須です'),
+  building: z.string().optional(),
   phone: z.string().min(1, '電話番号は必須です'),
   email: z.string().email('有効なメールアドレスを入力してください'),
 });
@@ -54,34 +61,68 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
         {/* 氏名（英語） */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <span className="text-red-500">*</span> {t('form.basicInfo.nameEn')}
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            <span className="text-red-500">*</span> 氏名（英語）
           </label>
-          <input
-            type="text"
-            {...register('nameEn')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="YAMADA Taro"
-          />
-          {errors.nameEn && (
-            <p className="mt-1 text-sm text-red-600">{String(errors.nameEn.message)}</p>
-          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">氏（英語）</label>
+              <input
+                type="text"
+                {...register('lastNameEn')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="YAMADA"
+              />
+              {errors.lastNameEn && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.lastNameEn.message)}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">名（英語）</label>
+              <input
+                type="text"
+                {...register('firstNameEn')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="TARO"
+              />
+              {errors.firstNameEn && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.firstNameEn.message)}</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 氏名（日本語） */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <span className="text-red-500">*</span> {t('form.basicInfo.nameJa')}
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            <span className="text-red-500">*</span> 氏名（日本語）
           </label>
-          <input
-            type="text"
-            {...register('nameJa')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="山田 太郎"
-          />
-          {errors.nameJa && (
-            <p className="mt-1 text-sm text-red-600">{String(errors.nameJa.message)}</p>
-          )}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">氏（日本語）</label>
+              <input
+                type="text"
+                {...register('lastNameJa')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="山田"
+              />
+              {errors.lastNameJa && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.lastNameJa.message)}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">名（日本語）</label>
+              <input
+                type="text"
+                {...register('firstNameJa')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="太郎"
+              />
+              {errors.firstNameJa && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.firstNameJa.message)}</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 国籍 */}
@@ -119,7 +160,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
           <input
             type="date"
             {...register('birthDate')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-left"
+            style={{ textAlign: 'left' }}
           />
           {errors.birthDate && (
             <p className="mt-1 text-sm text-red-600">{String(errors.birthDate.message)}</p>
@@ -128,18 +170,142 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
 
         {/* 住所 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            <span className="text-red-500">*</span> {t('form.basicInfo.address')}
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            <span className="text-red-500">*</span> 住所
           </label>
-          <textarea
-            {...register('address')}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="〒123-4567 東京都渋谷区..."
-          />
-          {errors.address && (
-            <p className="mt-1 text-sm text-red-600">{String(errors.address.message)}</p>
-          )}
+          <div className="space-y-3">
+            {/* 郵便番号 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">郵便番号</label>
+              <input
+                type="text"
+                {...register('postalCode')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="123-4567"
+              />
+              {errors.postalCode && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.postalCode.message)}</p>
+              )}
+            </div>
+
+            {/* 国 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">国</label>
+              <input
+                type="text"
+                {...register('country')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="日本"
+                defaultValue="日本"
+              />
+              {errors.country && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.country.message)}</p>
+              )}
+            </div>
+
+            {/* 都道府県 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">都道府県</label>
+              <select
+                {...register('prefecture')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">都道府県を選択してください</option>
+                <option value="北海道">北海道</option>
+                <option value="青森県">青森県</option>
+                <option value="岩手県">岩手県</option>
+                <option value="宮城県">宮城県</option>
+                <option value="秋田県">秋田県</option>
+                <option value="山形県">山形県</option>
+                <option value="福島県">福島県</option>
+                <option value="茨城県">茨城県</option>
+                <option value="栃木県">栃木県</option>
+                <option value="群馬県">群馬県</option>
+                <option value="埼玉県">埼玉県</option>
+                <option value="千葉県">千葉県</option>
+                <option value="東京都">東京都</option>
+                <option value="神奈川県">神奈川県</option>
+                <option value="新潟県">新潟県</option>
+                <option value="富山県">富山県</option>
+                <option value="石川県">石川県</option>
+                <option value="福井県">福井県</option>
+                <option value="山梨県">山梨県</option>
+                <option value="長野県">長野県</option>
+                <option value="岐阜県">岐阜県</option>
+                <option value="静岡県">静岡県</option>
+                <option value="愛知県">愛知県</option>
+                <option value="三重県">三重県</option>
+                <option value="滋賀県">滋賀県</option>
+                <option value="京都府">京都府</option>
+                <option value="大阪府">大阪府</option>
+                <option value="兵庫県">兵庫県</option>
+                <option value="奈良県">奈良県</option>
+                <option value="和歌山県">和歌山県</option>
+                <option value="鳥取県">鳥取県</option>
+                <option value="島根県">島根県</option>
+                <option value="岡山県">岡山県</option>
+                <option value="広島県">広島県</option>
+                <option value="山口県">山口県</option>
+                <option value="徳島県">徳島県</option>
+                <option value="香川県">香川県</option>
+                <option value="愛媛県">愛媛県</option>
+                <option value="高知県">高知県</option>
+                <option value="福岡県">福岡県</option>
+                <option value="佐賀県">佐賀県</option>
+                <option value="長崎県">長崎県</option>
+                <option value="熊本県">熊本県</option>
+                <option value="大分県">大分県</option>
+                <option value="宮崎県">宮崎県</option>
+                <option value="鹿児島県">鹿児島県</option>
+                <option value="沖縄県">沖縄県</option>
+              </select>
+              {errors.prefecture && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.prefecture.message)}</p>
+              )}
+            </div>
+
+            {/* 市区町村 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">市区町村</label>
+              <input
+                type="text"
+                {...register('city')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="渋谷区"
+              />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.city.message)}</p>
+              )}
+            </div>
+
+            {/* 番地 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">番地</label>
+              <input
+                type="text"
+                {...register('street')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="1-2-3"
+              />
+              {errors.street && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.street.message)}</p>
+              )}
+            </div>
+
+            {/* 建物名・部屋番号 */}
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">建物名・部屋番号（任意）</label>
+              <input
+                type="text"
+                {...register('building')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="○○マンション101号室"
+              />
+              {errors.building && (
+                <p className="mt-1 text-sm text-red-600">{String(errors.building.message)}</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 電話番号 */}

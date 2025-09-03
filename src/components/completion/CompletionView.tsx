@@ -45,14 +45,31 @@ const CompletionView: React.FC = () => {
   const generatePDFContent = () => {
     // 実際のPDF生成では適切なライブラリ（jsPDF、PDFKit等）を使用
     // ここでは簡易的なテキストファイルとして出力
+    const fullNameEn = formData.basicInfo?.lastNameEn && formData.basicInfo?.firstNameEn
+      ? `${formData.basicInfo.lastNameEn} ${formData.basicInfo.firstNameEn}`
+      : '';
+
+    const fullNameJa = formData.basicInfo?.lastNameJa && formData.basicInfo?.firstNameJa
+      ? `${formData.basicInfo.lastNameJa} ${formData.basicInfo.firstNameJa}`
+      : '';
+
+    const fullAddress = [
+      formData.basicInfo?.postalCode && `〒${formData.basicInfo.postalCode}`,
+      formData.basicInfo?.country,
+      formData.basicInfo?.prefecture,
+      formData.basicInfo?.city,
+      formData.basicInfo?.street,
+      formData.basicInfo?.building
+    ].filter(Boolean).join(' ');
+
     return `VISA申請書
 
 申請者情報:
-氏名（英語）: ${formData.basicInfo?.nameEn || ''}
-氏名（日本語）: ${formData.basicInfo?.nameJa || ''}
+氏名（英語）: ${fullNameEn}
+氏名（日本語）: ${fullNameJa}
 国籍: ${formData.basicInfo?.nationality || ''}
 生年月日: ${formData.basicInfo?.birthDate || ''}
-住所: ${formData.basicInfo?.address || ''}
+住所: ${fullAddress || ''}
 電話番号: ${formData.basicInfo?.phone || ''}
 メールアドレス: ${formData.basicInfo?.email || ''}
 
@@ -106,7 +123,13 @@ const CompletionView: React.FC = () => {
           <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-xl p-4 border border-blue-100/50">
             <div className="flex justify-between items-center">
               <span className="text-sm font-semibold text-gray-700">申請者氏名:</span>
-              <span className="text-sm sm:text-base font-bold text-gray-900">{formData.basicInfo?.nameJa || formData.basicInfo?.nameEn}</span>
+              <span className="text-sm sm:text-base font-bold text-gray-900">
+                {formData.basicInfo?.lastNameJa && formData.basicInfo?.firstNameJa
+                  ? `${formData.basicInfo.lastNameJa} ${formData.basicInfo.firstNameJa}`
+                  : (formData.basicInfo?.lastNameEn && formData.basicInfo?.firstNameEn
+                      ? `${formData.basicInfo.lastNameEn} ${formData.basicInfo.firstNameEn}`
+                      : '')}
+              </span>
             </div>
           </div>
           <div className="bg-gradient-to-r from-green-50/50 to-emerald-50/50 rounded-xl p-4 border border-green-100/50">
