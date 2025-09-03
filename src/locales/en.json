@@ -34,7 +34,61 @@
     "systemTitle": "System Requirements (Required for All)",
     "documentsTitle": "Required Documents",
     "allComplete": "All preparations are complete",
-    "proceedToForm": "Proceed to Application Form"
+    "proceedToForm": "Proceed to Application Form",
+    "documents": {
+      "employment-certificate": {
+        "name": "Employment Certificate",
+        "description": "Document proving current employment status"
+      },
+      "salary-statement": {
+        "name": "Salary Statement",
+        "description": "Salary statement for the last 3 months"
+      },
+      "tax-payment-certificate": {
+        "name": "Tax Payment Certificate",
+        "description": "Residence tax payment certificate"
+      },
+      "education-certificate": {
+        "name": "Education Certificate",
+        "description": "Certificate of final education"
+      },
+      "employment-contract": {
+        "name": "Employment Contract",
+        "description": "Contract with new employer"
+      },
+      "company-info": {
+        "name": "Company Information",
+        "description": "Company registration documents"
+      },
+      "enrollment-certificate": {
+        "name": "Enrollment Certificate",
+        "description": "Document proving current enrollment status"
+      },
+      "academic-transcript": {
+        "name": "Academic Transcript",
+        "description": "Recent academic transcript"
+      },
+      "tuition-payment-certificate": {
+        "name": "Tuition Payment Certificate",
+        "description": "Certificate of tuition payment"
+      },
+      "relationship-certificate": {
+        "name": "Relationship Certificate",
+        "description": "Marriage certificate or parent-child relationship certificate"
+      },
+      "income-certificate": {
+        "name": "Income Certificate",
+        "description": "Certificate of supporter's income"
+      },
+      "residence-certificate": {
+        "name": "Residence Certificate",
+        "description": "Family register for all household members"
+      },
+      "attendance-certificate": {
+        "name": "Attendance Certificate",
+        "description": "Certificate of attendance status"
+      }
+    }
   },
   "form": {
     "basicInfo": {

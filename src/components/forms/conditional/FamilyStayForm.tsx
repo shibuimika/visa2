@@ -20,14 +20,6 @@ const createSchema = (procedureType: ProcedureType) => {
       residenceRecord: z.string().min(1, '住民票は必須です'),
       currentVisaInfo: z.string().min(1, '現資格情報は必須です'),
     });
-  } else if (procedureType === 'acquisition') {
-    return z.object({
-      relationshipCertificate: z.string().min(1, '関係証明書は必須です'),
-      incomeCertificate: z.string().min(1, '収入証明書は必須です'),
-      residenceRecord: z.string().min(1, '住民票は必須です'),
-      dependentInfo: z.string().min(1, '扶養者情報は必須です'),
-      guarantorInfo: z.string().min(1, '身元保証人情報は必須です'),
-    });
   }
   
   // デフォルトスキーマ
@@ -36,8 +28,6 @@ const createSchema = (procedureType: ProcedureType) => {
     incomeCertificate: z.string().optional(),
     residenceRecord: z.string().optional(),
     currentVisaInfo: z.string().optional(),
-    dependentInfo: z.string().optional(),
-    guarantorInfo: z.string().optional(),
   });
 };
 
@@ -141,41 +131,7 @@ const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
           </div>
         )}
 
-        {procedureType === 'acquisition' && (
-          <>
-            <div>
-              <label htmlFor="dependentInfo" className="block text-sm font-medium text-gray-700 mb-1">
-                扶養者情報 *
-              </label>
-              <textarea
-                {...register('dependentInfo')}
-                id="dependentInfo"
-                rows={5}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="扶養者（配偶者または親）の詳細情報を入力してください（氏名、在留資格、職業、収入等）"
-              />
-              {errors.dependentInfo && (
-                <p className="text-red-600 text-sm mt-1">{String(errors.dependentInfo.message)}</p>
-              )}
-            </div>
 
-            <div>
-              <label htmlFor="guarantorInfo" className="block text-sm font-medium text-gray-700 mb-1">
-                身元保証人情報 *
-              </label>
-              <textarea
-                {...register('guarantorInfo')}
-                id="guarantorInfo"
-                rows={5}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="身元保証人の氏名、住所、職業、電話番号、あなたとの関係を記載してください"
-              />
-              {errors.guarantorInfo && (
-                <p className="text-red-600 text-sm mt-1">{String(errors.guarantorInfo.message)}</p>
-              )}
-            </div>
-          </>
-        )}
       </>
     );
   };
@@ -190,8 +146,6 @@ const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
         return `家族滞在（更新・${relationText}）`;
       case 'change':
         return `家族滞在（変更・${relationText}）`;
-      case 'acquisition':
-        return `家族滞在（取得・${relationText}）`;
       default:
         return `家族滞在（${relationText}）`;
     }

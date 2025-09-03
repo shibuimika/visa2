@@ -83,11 +83,11 @@ const FormContainer: React.FC = () => {
       component: PassportInfoForm,
       required: true 
     },
-    { 
-      id: 'residence', 
-      title: '在留カード情報', 
+    {
+      id: 'residence',
+      title: '在留カード情報',
       component: ResidenceCardForm,
-      required: survey.procedureType !== 'acquisition' // 新規取得以外は必須
+      required: survey.procedureType === 'renewal' // 更新時は必須
     },
     { 
       id: 'criminal', 

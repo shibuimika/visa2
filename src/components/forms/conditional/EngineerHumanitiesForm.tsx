@@ -23,13 +23,6 @@ const createSchema = (procedureType: ProcedureType) => {
       employmentContract: z.string().min(1, '雇用契約書は必須です'),
       companyInfo: z.string().min(1, '勤務先情報は必須です'),
     });
-  } else if (procedureType === 'acquisition') {
-    // 取得時の必須項目
-    return z.object({
-      acquisitionReason: z.string().min(1, '取得理由は必須です'),
-      residenceReason: z.string().min(1, '在留理由は必須です'),
-      guarantorInfo: z.string().min(1, '身元保証人情報は必須です'),
-    });
   }
   
   // デフォルトスキーマ（空だが正しい型を持つ）
@@ -42,9 +35,6 @@ const createSchema = (procedureType: ProcedureType) => {
     graduationCertificate: z.string().optional(),
     employmentContract: z.string().optional(),
     companyInfo: z.string().optional(),
-    acquisitionReason: z.string().optional(),
-    residenceReason: z.string().optional(),
-    guarantorInfo: z.string().optional(),
   });
 };
 
@@ -79,7 +69,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
 
   const renderFormFields = () => {
     const { procedureType } = survey;
-    
+
     if (procedureType === 'renewal') {
       return (
         <>
@@ -94,7 +84,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="在職証明書の詳細を入力してください"
             />
-            {errors.employmentCertificate && (
+            {errors.employmentCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.employmentCertificate.message)}</p>
             )}
           </div>
@@ -110,7 +100,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="直近の給与明細について入力してください"
             />
-            {errors.salarySlip && (
+            {errors.salarySlip?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.salarySlip.message)}</p>
             )}
           </div>
@@ -126,7 +116,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="納税証明書の情報を入力してください"
             />
-            {errors.taxCertificate && (
+            {errors.taxCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.taxCertificate.message)}</p>
             )}
           </div>
@@ -146,7 +136,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="最終学歴から順に記載してください"
             />
-            {errors.educationHistory && (
+            {errors.educationHistory?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.educationHistory.message)}</p>
             )}
           </div>
@@ -162,7 +152,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="職歴を時系列で記載してください"
             />
-            {errors.workHistory && (
+            {errors.workHistory?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.workHistory.message)}</p>
             )}
           </div>
@@ -178,7 +168,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="卒業証明書の詳細を入力してください"
             />
-            {errors.graduationCertificate && (
+            {errors.graduationCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.graduationCertificate.message)}</p>
             )}
           </div>
@@ -194,7 +184,7 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="雇用契約書の内容を入力してください"
             />
-            {errors.employmentContract && (
+            {errors.employmentContract?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.employmentContract.message)}</p>
             )}
           </div>
@@ -210,66 +200,14 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="勤務先の詳細情報を入力してください（会社名、住所、業種、資本金等）"
             />
-            {errors.companyInfo && (
+            {errors.companyInfo?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.companyInfo.message)}</p>
             )}
           </div>
         </>
       );
-    } else if (procedureType === 'acquisition') {
-      return (
-        <>
-          <div>
-            <label htmlFor="acquisitionReason" className="block text-sm font-medium text-gray-700 mb-1">
-              取得理由 *
-            </label>
-            <textarea
-              {...register('acquisitionReason')}
-              id="acquisitionReason"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="技術・人文知識・国際業務の在留資格を取得する理由を詳しく記載してください"
-            />
-            {errors.acquisitionReason && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.acquisitionReason.message)}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="residenceReason" className="block text-sm font-medium text-gray-700 mb-1">
-              在留理由 *
-            </label>
-            <textarea
-              {...register('residenceReason')}
-              id="residenceReason"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="日本に在留する理由を詳しく記載してください"
-            />
-            {errors.residenceReason && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.residenceReason.message)}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="guarantorInfo" className="block text-sm font-medium text-gray-700 mb-1">
-              身元保証人情報 *
-            </label>
-            <textarea
-              {...register('guarantorInfo')}
-              id="guarantorInfo"
-              rows={5}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="身元保証人の氏名、住所、職業、電話番号、あなたとの関係を記載してください"
-            />
-            {errors.guarantorInfo && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.guarantorInfo.message)}</p>
-            )}
-          </div>
-        </>
-      );
     }
-    
+
     return null;
   };
 
@@ -280,8 +218,6 @@ const EngineerHumanitiesForm: React.FC<EngineerHumanitiesFormProps> = ({ onNext,
         return '技術・人文知識・国際業務（更新）';
       case 'change':
         return '技術・人文知識・国際業務（変更）';
-      case 'acquisition':
-        return '技術・人文知識・国際業務（取得）';
       default:
         return '技術・人文知識・国際業務';
     }

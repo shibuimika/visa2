@@ -114,7 +114,7 @@ const ConfirmationView: React.FC = () => {
       </InfoSection>
 
       {/* 在留カード情報 */}
-      {survey.procedureType !== 'acquisition' && (
+      {survey.procedureType === 'renewal' && (
         <InfoSection title="在留カード情報" onEdit={() => handleEdit('residence')}>
           <div className="space-y-2">
             <DataRow label="在留カード番号" value={formData.residenceCardInfo?.cardNumber} />
@@ -186,9 +186,7 @@ const ConfirmationView: React.FC = () => {
             {formData.engineerHumanitiesInfo.educationHistory && (
               <DataRow label="学歴" value={formData.engineerHumanitiesInfo.educationHistory.substring(0, 50) + '...'} />
             )}
-            {formData.engineerHumanitiesInfo.acquisitionReason && (
-              <DataRow label="取得理由" value={formData.engineerHumanitiesInfo.acquisitionReason.substring(0, 50) + '...'} />
-            )}
+
           </div>
         </InfoSection>
       )}
@@ -225,9 +223,7 @@ const ConfirmationView: React.FC = () => {
             {formData.studentInfo.enrollmentCertificate && (
               <DataRow label="在学証明書" value={formData.studentInfo.enrollmentCertificate.substring(0, 50) + '...'} />
             )}
-            {formData.studentInfo.admissionPermit && (
-              <DataRow label="入学許可書" value={formData.studentInfo.admissionPermit.substring(0, 50) + '...'} />
-            )}
+
           </div>
         </InfoSection>
       )}
@@ -238,9 +234,7 @@ const ConfirmationView: React.FC = () => {
             {formData.familyStayInfo.relationshipCertificate && (
               <DataRow label="関係証明書" value={formData.familyStayInfo.relationshipCertificate.substring(0, 50) + '...'} />
             )}
-            {formData.familyStayInfo.dependentInfo && (
-              <DataRow label="扶養者情報" value={formData.familyStayInfo.dependentInfo.substring(0, 50) + '...'} />
-            )}
+
           </div>
         </InfoSection>
       )}

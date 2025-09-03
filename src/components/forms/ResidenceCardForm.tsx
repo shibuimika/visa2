@@ -37,51 +37,7 @@ const ResidenceCardForm: React.FC<ResidenceCardFormProps> = ({ onNext, onBack })
     onNext();
   };
 
-  // 新規取得の場合は在留カード情報は不要
-  const isNewApplication = survey?.procedureType === 'acquisition';
 
-  if (isNewApplication) {
-    return (
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            在留カード情報
-          </h2>
-          <p className="text-gray-600">
-            新規取得のため、在留カード情報の入力は不要です
-          </p>
-        </div>
-
-        <div className="p-6 bg-green-50 rounded-md text-center">
-          <svg className="mx-auto h-12 w-12 text-green-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-green-800 font-medium">
-            このステップをスキップして次に進みます
-          </p>
-        </div>
-
-        {/* ナビゲーションボタン */}
-        <div className="flex justify-between pt-6 border-t">
-          <button
-            type="button"
-            onClick={onBack}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            {t('common.back')}
-          </button>
-          
-          <button
-            type="button"
-            onClick={onNext}
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            {t('common.next')}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">

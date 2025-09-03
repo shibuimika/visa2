@@ -20,13 +20,6 @@ const createSchema = (procedureType: ProcedureType) => {
       supportPlan: z.string().min(1, '支援計画書は必須です'),
       employmentContract: z.string().min(1, '雇用契約書は必須です'),
     });
-  } else if (procedureType === 'acquisition') {
-    return z.object({
-      skillTestCertificate: z.string().min(1, '評価試験合格証は必須です'),
-      supportPlan: z.string().min(1, '支援計画書は必須です'),
-      employmentContract: z.string().min(1, '雇用契約書は必須です'),
-      guarantorInfo: z.string().min(1, '身元保証人情報は必須です'),
-    });
   }
   
   // デフォルトスキーマ
@@ -38,7 +31,6 @@ const createSchema = (procedureType: ProcedureType) => {
     skillTestCertificate: z.string().optional(),
     supportPlan: z.string().optional(),
     employmentContract: z.string().optional(),
-    guarantorInfo: z.string().optional(),
   });
 };
 
@@ -142,7 +134,7 @@ const SpecificSkill1Form: React.FC<SpecificSkill1FormProps> = ({ onNext, onBack 
           </div>
         </>
       );
-    } else if (procedureType === 'change' || procedureType === 'acquisition') {
+    } else if (procedureType === 'change') {
       return (
         <>
           <div>
@@ -193,23 +185,7 @@ const SpecificSkill1Form: React.FC<SpecificSkill1FormProps> = ({ onNext, onBack 
             )}
           </div>
 
-          {procedureType === 'acquisition' && (
-            <div>
-              <label htmlFor="guarantorInfo" className="block text-sm font-medium text-gray-700 mb-1">
-                身元保証人情報 *
-              </label>
-              <textarea
-                {...register('guarantorInfo')}
-                id="guarantorInfo"
-                rows={5}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="身元保証人の氏名、住所、職業、電話番号、あなたとの関係を記載してください"
-              />
-              {errors.guarantorInfo && (
-                <p className="text-red-600 text-sm mt-1">{String(errors.guarantorInfo.message)}</p>
-              )}
-            </div>
-          )}
+
         </>
       );
     }
@@ -224,8 +200,6 @@ const SpecificSkill1Form: React.FC<SpecificSkill1FormProps> = ({ onNext, onBack 
         return '特定技能1号（更新）';
       case 'change':
         return '特定技能1号（変更）';
-      case 'acquisition':
-        return '特定技能1号（取得）';
       default:
         return '特定技能1号';
     }

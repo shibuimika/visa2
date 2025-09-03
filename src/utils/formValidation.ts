@@ -7,7 +7,7 @@ export const safeVisaTypeConversion = (value: string): VisaType | undefined => {
 };
 
 export const safeProcedureTypeConversion = (value: string): ProcedureType | undefined => {
-  const validProcedureTypes: ProcedureType[] = ['renewal', 'change', 'acquisition'];
+  const validProcedureTypes: ProcedureType[] = ['renewal', 'change'];
   return validProcedureTypes.includes(value as ProcedureType) ? (value as ProcedureType) : undefined;
 };
 

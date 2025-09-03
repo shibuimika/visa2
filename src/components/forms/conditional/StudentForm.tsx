@@ -20,12 +20,6 @@ const createSchema = (procedureType: ProcedureType) => {
       employmentContract: z.string().min(1, '雇用契約書は必須です'),
       companyInfo: z.string().min(1, '勤務先情報は必須です'),
     });
-  } else if (procedureType === 'acquisition') {
-    return z.object({
-      admissionPermit: z.string().min(1, '入学許可書は必須です'),
-      tuitionPaymentOrBalance: z.string().min(1, '学費納入証明書または残高証明書は必須です'),
-      guarantorInfo: z.string().min(1, '身元保証人情報は必須です'),
-    });
   }
   
   // デフォルトスキーマ
@@ -37,9 +31,6 @@ const createSchema = (procedureType: ProcedureType) => {
     graduationCertificate: z.string().optional(),
     employmentContract: z.string().optional(),
     companyInfo: z.string().optional(),
-    admissionPermit: z.string().optional(),
-    tuitionPaymentOrBalance: z.string().optional(),
-    guarantorInfo: z.string().optional(),
   });
 };
 
@@ -74,7 +65,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
 
   const renderFormFields = () => {
     const { procedureType } = survey;
-    
+
     if (procedureType === 'renewal') {
       return (
         <>
@@ -89,7 +80,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="在学証明書の詳細を入力してください"
             />
-            {errors.enrollmentCertificate && (
+            {errors.enrollmentCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.enrollmentCertificate.message)}</p>
             )}
           </div>
@@ -105,7 +96,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="最新の成績証明書について入力してください"
             />
-            {errors.transcript && (
+            {errors.transcript?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.transcript.message)}</p>
             )}
           </div>
@@ -137,7 +128,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="学費の納入状況に関する証明書を入力してください"
             />
-            {errors.tuitionPaymentCertificate && (
+            {errors.tuitionPaymentCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.tuitionPaymentCertificate.message)}</p>
             )}
           </div>
@@ -157,7 +148,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="学校からの卒業証明書について入力してください"
             />
-            {errors.graduationCertificate && (
+            {errors.graduationCertificate?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.graduationCertificate.message)}</p>
             )}
           </div>
@@ -173,7 +164,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="就職先との雇用契約書の内容を入力してください"
             />
-            {errors.employmentContract && (
+            {errors.employmentContract?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.employmentContract.message)}</p>
             )}
           </div>
@@ -189,66 +180,14 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="就職先企業の詳細情報を入力してください（会社名、住所、業種、資本金等）"
             />
-            {errors.companyInfo && (
+            {errors.companyInfo?.message && (
               <p className="text-red-600 text-sm mt-1">{String(errors.companyInfo.message)}</p>
             )}
           </div>
         </>
       );
-    } else if (procedureType === 'acquisition') {
-      return (
-        <>
-          <div>
-            <label htmlFor="admissionPermit" className="block text-sm font-medium text-gray-700 mb-1">
-              入学許可書 *
-            </label>
-            <textarea
-              {...register('admissionPermit')}
-              id="admissionPermit"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="日本の教育機関からの入学許可書について入力してください"
-            />
-            {errors.admissionPermit && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.admissionPermit.message)}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="tuitionPaymentOrBalance" className="block text-sm font-medium text-gray-700 mb-1">
-              学費納入証明書または残高証明書 *
-            </label>
-            <textarea
-              {...register('tuitionPaymentOrBalance')}
-              id="tuitionPaymentOrBalance"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="学費の支払い能力を証明する書類（納入証明書または銀行残高証明書）について入力してください"
-            />
-            {errors.tuitionPaymentOrBalance && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.tuitionPaymentOrBalance.message)}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="guarantorInfo" className="block text-sm font-medium text-gray-700 mb-1">
-              身元保証人情報 *
-            </label>
-            <textarea
-              {...register('guarantorInfo')}
-              id="guarantorInfo"
-              rows={5}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="身元保証人の氏名、住所、職業、電話番号、あなたとの関係を記載してください"
-            />
-            {errors.guarantorInfo && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.guarantorInfo.message)}</p>
-            )}
-          </div>
-        </>
-      );
     }
-    
+
     return null;
   };
 
@@ -259,8 +198,6 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
         return '留学（更新）';
       case 'change':
         return '留学（変更）';
-      case 'acquisition':
-        return '留学（取得）';
       default:
         return '留学';
     }

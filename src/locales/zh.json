@@ -34,7 +34,61 @@
     "systemTitle": "系统要求（所有人必需）",
     "documentsTitle": "必需文件",
     "allComplete": "所有准备工作已完成",
-    "proceedToForm": "进入申请表格"
+    "proceedToForm": "进入申请表格",
+    "documents": {
+      "employment-certificate": {
+        "name": "在职证明书",
+        "description": "证明当前就业状况的文件"
+      },
+      "salary-statement": {
+        "name": "工资明细",
+        "description": "最近3个月的工资明细"
+      },
+      "tax-payment-certificate": {
+        "name": "纳税证明书",
+        "description": "居民税纳税证明书"
+      },
+      "education-certificate": {
+        "name": "学历证明书",
+        "description": "最终学历的毕业证明书"
+      },
+      "employment-contract": {
+        "name": "雇用合同",
+        "description": "与新雇主的合同"
+      },
+      "company-info": {
+        "name": "公司信息",
+        "description": "公司登记文件等"
+      },
+      "enrollment-certificate": {
+        "name": "在学证明书",
+        "description": "证明当前在学状况的文件"
+      },
+      "academic-transcript": {
+        "name": "成绩证明书",
+        "description": "最近的成绩证明书"
+      },
+      "tuition-payment-certificate": {
+        "name": "学费缴纳证明书",
+        "description": "证明学费缴纳的文件"
+      },
+      "relationship-certificate": {
+        "name": "关系证明书",
+        "description": "结婚证明书或亲子关系证明书"
+      },
+      "income-certificate": {
+        "name": "收入证明书",
+        "description": "抚养人的收入证明"
+      },
+      "residence-certificate": {
+        "name": "住民票",
+        "description": "全户成员的住民票"
+      },
+      "attendance-certificate": {
+        "name": "出席证明书",
+        "description": "关于出席状况的证明书"
+      }
+    }
   },
   "form": {
     "basicInfo": {

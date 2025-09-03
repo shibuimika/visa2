@@ -10,7 +10,7 @@ export interface UserInfo {
 export type VisaType = 'engineer' | 'specific-1' | 'specific-2' | 'student' | 'family';
 
 // 手続き種類の型
-export type ProcedureType = 'renewal' | 'change' | 'acquisition';
+export type ProcedureType = 'renewal' | 'change';
 
 // 家族滞在の関係性
 export type FamilyRelation = 'spouse' | 'child' | 'other';
@@ -110,10 +110,7 @@ export interface EngineerHumanitiesInfo {
   employmentContract?: string; // 雇用契約書
   companyInfo?: string; // 勤務先情報
   
-  // 取得時
-  acquisitionReason?: string; // 取得理由
-  residenceReason?: string; // 在留理由
-  guarantorInfo?: string; // 身元保証人情報
+
 }
 
 // 条件付きフォーム - 特定技能1号
@@ -124,13 +121,10 @@ export interface SpecificSkill1Info {
   supportReport?: string; // 支援状況報告書
   taxCertificate?: string; // 納税証明書
   
-  // 変更・取得時
+  // 変更時
   skillTestCertificate?: string; // 評価試験合格証
   supportPlan?: string; // 支援計画書
   employmentContract?: string; // 雇用契約書
-  
-  // 取得時
-  guarantorInfo?: string; // 身元保証人情報
 }
 
 // 条件付きフォーム - 特定技能2号
@@ -140,14 +134,11 @@ export interface SpecificSkill2Info {
   salarySlip?: string; // 給与明細
   taxCertificate?: string; // 納税証明書
   
-  // 変更・取得時
+  // 変更時
   workExperienceCertificate?: string; // 実務経験証明
   skillTestCertificate?: string; // 技能試験合格証
   employmentContract?: string; // 雇用契約書
   organizationInfo?: string; // 所属機関情報
-  
-  // 取得時
-  guarantorInfo?: string; // 身元保証人情報
 }
 
 // 条件付きフォーム - 留学
@@ -162,11 +153,6 @@ export interface StudentInfo {
   graduationCertificate?: string; // 卒業証明書
   employmentContract?: string; // 雇用契約書
   companyInfo?: string; // 勤務先情報
-  
-  // 取得時
-  admissionPermit?: string; // 入学許可書
-  tuitionPaymentOrBalance?: string; // 学費納入証明書または残高証明書
-  guarantorInfo?: string; // 身元保証人情報
 }
 
 // 条件付きフォーム - 家族滞在
@@ -178,10 +164,6 @@ export interface FamilyStayInfo {
   
   // 変更時
   currentVisaInfo?: string; // 現資格情報
-  
-  // 取得時
-  dependentInfo?: string; // 扶養者情報
-  guarantorInfo?: string; // 身元保証人情報
 }
 
 // フォームデータ全体

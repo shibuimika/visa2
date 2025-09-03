@@ -41,11 +41,6 @@ export const PROCEDURE_TYPES: Record<ProcedureType, { ja: string; en: string; zh
     en: 'Change',
     zh: '变更',
   },
-  acquisition: {
-    ja: '取得',
-    en: 'Acquisition',
-    zh: '取得',
-  },
 };
 
 // 家族滞在の関係性

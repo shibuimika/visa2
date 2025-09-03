@@ -26,20 +26,6 @@ const createSchema = (procedureType: ProcedureType) => {
         path: ['workExperienceCertificate'],
       }
     );
-  } else if (procedureType === 'acquisition') {
-    return z.object({
-      workExperienceCertificate: z.string().optional(),
-      skillTestCertificate: z.string().optional(),
-      employmentContract: z.string().min(1, '雇用契約書は必須です'),
-      organizationInfo: z.string().min(1, '所属機関情報は必須です'),
-      guarantorInfo: z.string().min(1, '身元保証人情報は必須です'),
-    }).refine(
-      (data) => data.workExperienceCertificate || data.skillTestCertificate,
-      {
-        message: '実務経験証明または技能試験合格証のいずれかは必須です',
-        path: ['workExperienceCertificate'],
-      }
-    );
   }
   
   // デフォルトスキーマ
@@ -51,7 +37,6 @@ const createSchema = (procedureType: ProcedureType) => {
     skillTestCertificate: z.string().optional(),
     employmentContract: z.string().optional(),
     organizationInfo: z.string().optional(),
-    guarantorInfo: z.string().optional(),
   });
 };
 
@@ -139,7 +124,7 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
           </div>
         </>
       );
-    } else if (procedureType === 'change' || procedureType === 'acquisition') {
+    } else if (procedureType === 'change') {
       return (
         <>
           <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
@@ -212,23 +197,7 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
             )}
           </div>
 
-          {procedureType === 'acquisition' && (
-            <div>
-              <label htmlFor="guarantorInfo" className="block text-sm font-medium text-gray-700 mb-1">
-                身元保証人情報 *
-              </label>
-              <textarea
-                {...register('guarantorInfo')}
-                id="guarantorInfo"
-                rows={5}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="身元保証人の氏名、住所、職業、電話番号、あなたとの関係を記載してください"
-              />
-              {errors.guarantorInfo && (
-                <p className="text-red-600 text-sm mt-1">{String(errors.guarantorInfo.message)}</p>
-              )}
-            </div>
-          )}
+
         </>
       );
     }
@@ -243,8 +212,6 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
         return '特定技能2号（更新）';
       case 'change':
         return '特定技能2号（変更）';
-      case 'acquisition':
-        return '特定技能2号（取得）';
       default:
         return '特定技能2号';
     }
