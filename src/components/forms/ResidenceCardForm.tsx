@@ -21,7 +21,7 @@ interface ResidenceCardFormProps {
 
 const ResidenceCardForm: React.FC<ResidenceCardFormProps> = ({ onNext, onBack }) => {
   const { t } = useTranslation();
-  const { formData, updateFormData, survey } = useAppStore();
+  const { formData, updateFormData } = useAppStore();
 
   const {
     register,
