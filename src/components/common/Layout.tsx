@@ -23,22 +23,28 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {showHeader && (
-        <header className="bg-white shadow-sm border-b">
+        <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <h1 className="text-xl font-semibold text-gray-900">
-                  VISA申請サービス
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+                  <span className="block sm:hidden">VISA申請</span>
+                  <span className="hidden sm:block">VISA申請サービス</span>
                 </h1>
               </div>
-              
-              <div className="flex items-center space-x-4">
+
+              <div className="flex items-center space-x-2 sm:space-x-4">
                 <select
                   value={i18n.language}
                   onChange={(e) => changeLanguage(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="text-sm rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white"
                 >
                   <option value="ja">日本語</option>
                   <option value="en">English</option>
@@ -50,29 +56,10 @@ const Layout: React.FC<LayoutProps> = ({
         </header>
       )}
 
-      {showProgress && (
-        <div className="bg-white border-b">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center">
-              <div className="flex-1">
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                  <span>進行状況</span>
-                  <span>{currentStep + 1} / {totalSteps}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          {children}
         </div>
-      )}
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
       </main>
     </div>
   );
