@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../stores/appStore';
 import BasicInfoForm from './BasicInfoForm';
@@ -19,97 +19,121 @@ const FormContainer: React.FC = () => {
   const { survey } = useAppStore();
   const [currentStep, setCurrentStep] = useState(0);
 
-  // アンケート結果がない場合はアンケートページにリダイレクト
-  if (!survey) {
-    navigate('/survey');
-    return null;
-  }
+  // 条件付きフォームのステップを決定とstepsの作成を統合
+  const steps = useMemo(() => {
+    if (!survey) return [];
 
-  // 条件付きフォームのステップを決定
-  const getConditionalStep = () => {
+    // 条件付きフォームの決定
+    let conditionalStep = null;
     switch (survey.visaType) {
       case 'engineer':
-        return { 
-          id: 'engineer', 
-          title: '技人国情報', 
+        conditionalStep = {
+          id: 'engineer',
+          title: '技人国情報',
           component: EngineerHumanitiesForm,
-          required: true 
+          required: true
         };
+        break;
       case 'specific-1':
-        return { 
-          id: 'specific1', 
-          title: '特定技能1号情報', 
+        conditionalStep = {
+          id: 'specific1',
+          title: '特定技能1号情報',
           component: SpecificSkill1Form,
-          required: true 
+          required: true
         };
+        break;
       case 'specific-2':
-        return { 
-          id: 'specific2', 
-          title: '特定技能2号情報', 
+        conditionalStep = {
+          id: 'specific2',
+          title: '特定技能2号情報',
           component: SpecificSkill2Form,
-          required: true 
+          required: true
         };
+        break;
       case 'student':
-        return { 
-          id: 'student', 
-          title: '留学情報', 
+        conditionalStep = {
+          id: 'student',
+          title: '留学情報',
           component: StudentForm,
-          required: true 
+          required: true
         };
+        break;
       case 'family':
-        return { 
-          id: 'family-stay', 
-          title: '家族滞在情報', 
+        conditionalStep = {
+          id: 'family-stay',
+          title: '家族滞在情報',
           component: FamilyStayForm,
-          required: true 
+          required: true
         };
-      default:
-        return null;
+        break;
     }
-  };
 
-  const conditionalStep = getConditionalStep();
+    return [
+      {
+        id: 'basic',
+        title: '基本情報',
+        component: BasicInfoForm,
+        required: true
+      },
+      {
+        id: 'passport',
+        title: 'パスポート情報',
+        component: PassportInfoForm,
+        required: true
+      },
+      {
+        id: 'residence',
+        title: '在留カード情報',
+        component: ResidenceCardForm,
+        required: survey.procedureType === 'renewal' // 更新時は必須
+      },
+      {
+        id: 'criminal',
+        title: '犯罪歴',
+        component: CriminalHistoryForm,
+        required: true
+      },
+      {
+        id: 'family',
+        title: '親族・同居者',
+        component: FamilyInfoForm,
+        required: true
+      },
+      // 条件付きフォーム（在留資格により動的に決定）
+      ...(conditionalStep ? [conditionalStep] : []),
+      {
+        id: 'photo',
+        title: '証明写真',
+        component: PhotoUploadForm,
+        required: true
+      },
+    ];
+  }, [survey]);
 
-  const steps = [
-    { 
-      id: 'basic', 
-      title: '基本情報', 
-      component: BasicInfoForm,
-      required: true 
-    },
-    { 
-      id: 'passport', 
-      title: 'パスポート情報', 
-      component: PassportInfoForm,
-      required: true 
-    },
-    {
-      id: 'residence',
-      title: '在留カード情報',
-      component: ResidenceCardForm,
-      required: survey.procedureType === 'renewal' // 更新時は必須
-    },
-    { 
-      id: 'criminal', 
-      title: '犯罪歴', 
-      component: CriminalHistoryForm,
-      required: true 
-    },
-    { 
-      id: 'family', 
-      title: '親族・同居者', 
-      component: FamilyInfoForm,
-      required: true 
-    },
-    // 条件付きフォーム（在留資格により動的に決定）
-    ...(conditionalStep ? [conditionalStep] : []),
-    { 
-      id: 'photo', 
-      title: '証明写真', 
-      component: PhotoUploadForm,
-      required: true 
-    },
-  ];
+  // 初期化処理（surveyのチェックとターゲットステップの設定）
+  useEffect(() => {
+    if (!survey) {
+      navigate('/survey');
+      return;
+    }
+
+    // stepsが作成された後にターゲットステップを設定
+    if (steps.length > 0) {
+      const targetStep = localStorage.getItem('formTargetStep');
+      if (targetStep !== null) {
+        const stepIndex = parseInt(targetStep, 10);
+        if (stepIndex >= 0 && stepIndex < steps.length) {
+          setCurrentStep(stepIndex);
+        }
+        localStorage.removeItem('formTargetStep');
+      }
+    }
+  }, [survey, navigate, steps]);
+
+  // アンケート結果がない場合は何も表示しない
+  if (!survey) {
+    return null;
+  }
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {

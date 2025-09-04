@@ -74,25 +74,25 @@ const SurveyForm: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 sm:p-8 lg:p-10">
-      <div className="text-center mb-8 sm:mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-6">
-          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="text-center mb-6 sm:mb-8 lg:mb-12">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-blue-100 rounded-2xl mb-4 sm:mb-6">
+          <svg className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
           {t('survey.title')}
         </h2>
-        <p className="text-base sm:text-lg text-gray-600 max-w-lg mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-lg mx-auto leading-relaxed">
           {t('survey.description')}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 lg:space-y-8">
         {/* 質問1: 在留資格 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-          <label className="block text-lg font-semibold text-gray-900 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-sm">
+          <label className="block text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             <span className="inline-flex items-center">
               <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white text-sm font-bold rounded-full mr-3">1</span>
               <span className="text-red-500">*</span> {t('survey.visaType')}
@@ -131,8 +131,8 @@ const SurveyForm: React.FC = () => {
         </div>
 
         {/* 質問2: 手続き種類 */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
-          <label className="block text-lg font-semibold text-gray-900 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:p-8 shadow-sm">
+          <label className="block text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             <span className="inline-flex items-center">
               <span className="flex items-center justify-center w-6 h-6 bg-blue-600 text-white text-sm font-bold rounded-full mr-3">2</span>
               <span className="text-red-500">*</span> {t('survey.procedureType')}
@@ -241,8 +241,8 @@ const SurveyForm: React.FC = () => {
           </div>
         )}
 
-        {/* 送信ボタン */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-8">
+        {/* ナビゲーションボタン */}
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 pt-6 sm:pt-8 pb-4 sm:pb-6 border-t border-gray-200 mt-8">
           <button
             type="button"
             onClick={() => navigate(-1)}

@@ -52,13 +52,44 @@ const PhotoUploadForm: React.FC<PhotoUploadFormProps> = ({ onNext, onBack }) => 
       return;
     }
 
-    // 画像をBase64に変換してプレビュー表示
+    // 画像をBase64に変換してプレビュー表示（サイズを最適化）
     const reader = new FileReader();
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
-      setPhotoPreview(dataUrl);
-      setValue('photoDataUrl', dataUrl);
-      setValue('photoFile', file);
+
+      // 画像を圧縮してから保存
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // サイズを最大500pxに制限して圧縮
+        const maxSize = 500;
+        let { width, height } = img;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8); // 80%品質で圧縮
+
+        setPhotoPreview(compressedDataUrl);
+        setValue('photoDataUrl', compressedDataUrl);
+        setValue('photoFile', file);
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   };
@@ -191,7 +222,7 @@ const PhotoUploadForm: React.FC<PhotoUploadFormProps> = ({ onNext, onBack }) => 
         </div>
 
         {/* ナビゲーションボタン */}
-        <div className="flex justify-between pt-6 border-t">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 pt-6 sm:pt-8 pb-4 sm:pb-6 border-t border-gray-200 mt-8">
           <button
             type="button"
             onClick={onBack}

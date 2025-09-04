@@ -284,7 +284,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
         )}
 
         {/* ナビゲーションボタン */}
-        <div className="flex justify-between pt-6 border-t">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 pt-6 sm:pt-8 pb-4 sm:pb-6 border-t border-gray-200 mt-8">
           <button
             type="button"
             onClick={onBack}

@@ -120,7 +120,7 @@
     "description": "入力内容を確認してください。修正する場合は各セクションの編集ボタンを押してください。"
   },
   "completion": {
-    "title": "申請完了",
+    "title": "申請書作成完了",
     "description": "申請書が正常に生成されました。",
     "downloadPdf": "PDF申請書をダウンロード",
     "submissionGuide": "出入国在留管理庁への提出手順"

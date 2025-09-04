@@ -110,12 +110,30 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'visa-app-store',
-      partialize: (state) => ({
-        user: state.user,
-        survey: state.survey,
-        requirements: state.requirements,
-        formData: state.formData,
-      }),
+      partialize: (state) => {
+        // ファイルデータを除外するヘルパー関数
+        const excludeFileData = (obj: any) => {
+          if (!obj || typeof obj !== 'object') return obj;
+
+          const result = { ...obj };
+          Object.keys(result).forEach(key => {
+            if (result[key] instanceof File ||
+                (typeof result[key] === 'string' && result[key].startsWith('data:'))) {
+              result[key] = undefined;
+            } else if (typeof result[key] === 'object' && result[key] !== null) {
+              result[key] = excludeFileData(result[key]);
+            }
+          });
+          return result;
+        };
+
+        return {
+          user: state.user,
+          survey: state.survey,
+          requirements: state.requirements,
+          formData: excludeFileData(state.formData),
+        };
+      },
     }
   )
 );

@@ -48,20 +48,20 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
-      <div className="text-center mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6">
+      <div className="text-center mb-4 sm:mb-6 lg:mb-8">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
           {t('form.basicInfo.title')}
         </h2>
-        <p className="text-sm sm:text-base text-gray-600">
+        <p className="text-xs sm:text-sm lg:text-base text-gray-600">
           基本的な個人情報を入力してください
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4 lg:space-y-6">
         {/* 氏名（英語） */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
             <span className="text-red-500">*</span> 氏名（英語）
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -94,7 +94,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
 
         {/* 氏名（日本語） */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
             <span className="text-red-500">*</span> 氏名（日本語）
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -170,7 +170,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
 
         {/* 住所 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
             <span className="text-red-500">*</span> 住所
           </label>
           <div className="space-y-3">
@@ -341,7 +341,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ onNext, onBack }) => {
         </div>
 
         {/* ナビゲーションボタン */}
-        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 sm:pt-6 border-t">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 sm:gap-0 pt-6 sm:pt-8 pb-4 sm:pb-6 border-t border-gray-200 mt-8">
           <button
             type="button"
             onClick={onBack}
