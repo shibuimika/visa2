@@ -1,38 +1,23 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppStore } from '../../../stores/appStore';
 import { StudentInfo, ProcedureType } from '../../../types';
 
-// バリデーションスキーマ
-const createSchema = (procedureType: ProcedureType) => {
-  if (procedureType === 'renewal') {
-    return z.object({
-      enrollmentCertificate: z.string().min(1, '在学証明書は必須です'),
-      transcript: z.string().min(1, '成績証明書は必須です'),
-      attendanceCertificate: z.string().min(1, '出席証明書は必須です'),
-      tuitionPaymentCertificate: z.string().min(1, '学費納入証明書は必須です'),
-    });
-  } else if (procedureType === 'change') {
-    return z.object({
-      graduationCertificate: z.string().min(1, '卒業証明書は必須です'),
-      employmentContract: z.string().min(1, '雇用契約書は必須です'),
-      companyInfo: z.string().min(1, '勤務先情報は必須です'),
-    });
-  }
-  
-  // デフォルトスキーマ
-  return z.object({
-    enrollmentCertificate: z.string().optional(),
-    transcript: z.string().optional(),
-    attendanceCertificate: z.string().optional(),
-    tuitionPaymentCertificate: z.string().optional(),
-    graduationCertificate: z.string().optional(),
-    employmentContract: z.string().optional(),
-    companyInfo: z.string().optional(),
-  });
-};
+// Zodスキーマとインターフェースの型を一致させる
+const fileOrStringSchema = z.instanceof(File).or(z.string()).optional();
+
+// バリデーションスキーマ - StudentInfoインターフェースと完全に一致させる
+const schema = z.object({
+  enrollmentCertificate: fileOrStringSchema,
+  transcript: fileOrStringSchema,
+  attendanceCertificate: fileOrStringSchema,
+  tuitionPaymentCertificate: fileOrStringSchema,
+  graduationCertificate: fileOrStringSchema,
+  employmentContract: fileOrStringSchema,
+  companyInfo: z.string().optional(),
+});
 
 interface StudentFormProps {
   onNext: () => void;
@@ -41,14 +26,98 @@ interface StudentFormProps {
 
 const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
   const { formData, survey, updateFormData } = useAppStore();
-  
+  const fileInputRefs = {
+    enrollmentCertificate: useRef<HTMLInputElement>(null),
+    transcript: useRef<HTMLInputElement>(null),
+    attendanceCertificate: useRef<HTMLInputElement>(null),
+    tuitionPaymentCertificate: useRef<HTMLInputElement>(null),
+    graduationCertificate: useRef<HTMLInputElement>(null),
+    employmentContract: useRef<HTMLInputElement>(null),
+  };
+
+  // ファイルプレビュー状態
+  const [filePreviews, setFilePreviews] = useState<{
+    enrollmentCertificate?: string;
+    transcript?: string;
+    attendanceCertificate?: string;
+    tuitionPaymentCertificate?: string;
+    graduationCertificate?: string;
+    employmentContract?: string;
+  }>({
+    enrollmentCertificate: typeof formData.studentInfo?.enrollmentCertificate === 'string'
+      ? formData.studentInfo.enrollmentCertificate
+      : undefined,
+    transcript: typeof formData.studentInfo?.transcript === 'string'
+      ? formData.studentInfo.transcript
+      : undefined,
+    attendanceCertificate: typeof formData.studentInfo?.attendanceCertificate === 'string'
+      ? formData.studentInfo.attendanceCertificate
+      : undefined,
+    tuitionPaymentCertificate: typeof formData.studentInfo?.tuitionPaymentCertificate === 'string'
+      ? formData.studentInfo.tuitionPaymentCertificate
+      : undefined,
+    graduationCertificate: typeof formData.studentInfo?.graduationCertificate === 'string'
+      ? formData.studentInfo.graduationCertificate
+      : undefined,
+    employmentContract: typeof formData.studentInfo?.employmentContract === 'string'
+      ? formData.studentInfo.employmentContract
+      : undefined,
+  });
+
+  const [uploadErrors, setUploadErrors] = useState<{[key: string]: string}>({});
+
+  // ファイル処理関数
+  const handleFileChange = (
+    fieldName: keyof typeof fileInputRefs,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    setUploadErrors(prev => ({ ...prev, [fieldName]: '' }));
+
+    if (!file) return;
+
+    // ファイルサイズチェック（10MB以下）
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'ファイルサイズは10MB以下にしてください' }));
+      return;
+    }
+
+    // ファイル形式チェック（PDF, JPG, PNG）
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'PDF、JPG、PNGファイルを選択してください' }));
+      return;
+    }
+
+    // 画像をBase64に変換してプレビュー表示
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setFilePreviews(prev => ({ ...prev, [fieldName]: dataUrl }));
+      setValue(fieldName, dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = (fieldName: keyof typeof fileInputRefs) => {
+    setFilePreviews(prev => ({ ...prev, [fieldName]: undefined }));
+    setValue(fieldName, '');
+    if (fileInputRefs[fieldName].current) {
+      fileInputRefs[fieldName].current!.value = '';
+    }
+  };
+
   // surveyの初期値を設定してhooksが条件付きで呼ばれないようにする
   const currentSurvey = survey || { procedureType: 'renewal' as ProcedureType, visaType: 'student' as any };
-  const schema = createSchema(currentSurvey.procedureType);
-  
+
+  // 条件分岐による必須チェック（UI側で制御）
+  const isRenewal = currentSurvey.procedureType === 'renewal';
+
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<StudentInfo>({
     resolver: zodResolver(schema),
@@ -58,10 +127,149 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
   // survey が存在しない場合のみ早期リターン
   if (!survey) return null;
 
+  // フォームの現在の値を取得
+  const watchedValues = watch();
+
+  // 次へ進むボタンの有効化チェック
+  const isNextButtonEnabled = () => {
+    const { procedureType } = survey;
+
+    if (procedureType === 'renewal') {
+      // 更新時は在学証明書、成績証明書、出席証明書、学費納入証明書が必須
+      return !!(
+        watchedValues.enrollmentCertificate &&
+        watchedValues.transcript &&
+        watchedValues.attendanceCertificate &&
+        watchedValues.tuitionPaymentCertificate
+      );
+    } else if (procedureType === 'change') {
+      // 変更時は卒業証明書、雇用契約書が必須
+      return !!(
+        watchedValues.graduationCertificate &&
+        watchedValues.employmentContract
+      );
+    }
+
+    return false;
+  };
+
+  // 必須フィールドのチェック関数
+  const validateRequiredFields = (data: StudentInfo) => {
+    const { procedureType } = survey;
+    const errors: string[] = [];
+
+    if (procedureType === 'renewal') {
+      // 更新時は在学証明書、成績証明書、出席証明書、学費納入証明書が必須
+      if (!data.enrollmentCertificate) {
+        errors.push('在学証明書');
+      }
+      if (!data.transcript) {
+        errors.push('成績証明書');
+      }
+      if (!data.attendanceCertificate) {
+        errors.push('出席証明書');
+      }
+      if (!data.tuitionPaymentCertificate) {
+        errors.push('学費納入証明書');
+      }
+    } else if (procedureType === 'change') {
+      // 変更時は卒業証明書、雇用契約書が必須
+      if (!data.graduationCertificate) {
+        errors.push('卒業証明書');
+      }
+      if (!data.employmentContract) {
+        errors.push('雇用契約書');
+      }
+    }
+
+    return errors;
+  };
+
   const onSubmit = (data: StudentInfo) => {
+    const validationErrors = validateRequiredFields(data);
+    if (validationErrors.length > 0) {
+      alert(`以下の項目は必須です：\n${validationErrors.join('\n')}`);
+      return;
+    }
     updateFormData({ studentInfo: data });
     onNext();
   };
+
+  // ファイルアップロードフィールドコンポーネント
+  const FileUploadField: React.FC<{
+    label: string;
+    fieldName: keyof typeof fileInputRefs;
+    required?: boolean;
+    placeholder?: string;
+  }> = ({ label, fieldName, required = false, placeholder }) => (
+    <div>
+      <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700 mb-1">
+        {required && <span className="text-red-500">*</span>} {label}
+      </label>
+
+      {/* ファイルプレビュー */}
+      <div className="flex flex-col items-center space-y-4 mb-4">
+        {filePreviews[fieldName] ? (
+          <div className="relative">
+            {filePreviews[fieldName]?.startsWith('data:image/') ? (
+              <img
+                src={filePreviews[fieldName]}
+                alt={`${label}プレビュー`}
+                className="w-32 h-40 object-cover border-2 border-gray-300 rounded-md"
+              />
+            ) : (
+              <div className="w-32 h-40 border-2 border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs text-gray-500 mt-1">PDFファイル</p>
+                </div>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => removeFile(fieldName)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <div className="w-32 h-40 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              <p className="text-xs text-gray-500 mt-1">ファイルなし</p>
+            </div>
+          </div>
+        )}
+
+        {/* ファイル選択ボタン */}
+        <div>
+          <input
+            ref={fileInputRefs[fieldName]}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileChange(fieldName, e)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRefs[fieldName].current?.click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+          >
+            {filePreviews[fieldName] ? 'ファイルを変更' : 'ファイルを選択'}
+          </button>
+        </div>
+      </div>
+
+      {uploadErrors[fieldName] && (
+        <p className="mt-2 text-sm text-red-600">{uploadErrors[fieldName]}</p>
+      )}
+    </div>
+  );
 
   const renderFormFields = () => {
     const { procedureType } = survey;
@@ -69,105 +277,45 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
     if (procedureType === 'renewal') {
       return (
         <>
-          <div>
-            <label htmlFor="enrollmentCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              在学証明書 *
-            </label>
-            <textarea
-              {...register('enrollmentCertificate')}
-              id="enrollmentCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="在学証明書の詳細を入力してください"
-            />
-            {errors.enrollmentCertificate?.message && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.enrollmentCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="在学証明書"
+            fieldName="enrollmentCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="transcript" className="block text-sm font-medium text-gray-700 mb-1">
-              成績証明書 *
-            </label>
-            <textarea
-              {...register('transcript')}
-              id="transcript"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="最新の成績証明書について入力してください"
-            />
-            {errors.transcript?.message && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.transcript.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="成績証明書"
+            fieldName="transcript"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="attendanceCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              出席証明書 *
-            </label>
-            <textarea
-              {...register('attendanceCertificate')}
-              id="attendanceCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="出席状況に関する証明書の内容を入力してください"
-            />
-            {errors.attendanceCertificate && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.attendanceCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="出席証明書"
+            fieldName="attendanceCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="tuitionPaymentCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              学費納入証明書 *
-            </label>
-            <textarea
-              {...register('tuitionPaymentCertificate')}
-              id="tuitionPaymentCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="学費の納入状況に関する証明書を入力してください"
-            />
-            {errors.tuitionPaymentCertificate?.message && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.tuitionPaymentCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="学費納入証明書"
+            fieldName="tuitionPaymentCertificate"
+            required={true}
+          />
         </>
       );
     } else if (procedureType === 'change') {
       return (
         <>
-          <div>
-            <label htmlFor="graduationCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              卒業証明書 *
-            </label>
-            <textarea
-              {...register('graduationCertificate')}
-              id="graduationCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="学校からの卒業証明書について入力してください"
-            />
-            {errors.graduationCertificate?.message && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.graduationCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="卒業証明書"
+            fieldName="graduationCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="employmentContract" className="block text-sm font-medium text-gray-700 mb-1">
-              雇用契約書 *
-            </label>
-            <textarea
-              {...register('employmentContract')}
-              id="employmentContract"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="就職先との雇用契約書の内容を入力してください"
-            />
-            {errors.employmentContract?.message && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.employmentContract.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="雇用契約書"
+            fieldName="employmentContract"
+            required={true}
+          />
 
           <div>
             <label htmlFor="companyInfo" className="block text-sm font-medium text-gray-700 mb-1">
@@ -228,7 +376,12 @@ const StudentForm: React.FC<StudentFormProps> = ({ onNext, onBack }) => {
 
           <button
             type="submit"
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={!isNextButtonEnabled()}
+            className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isNextButtonEnabled()
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
           >
             次へ
           </button>

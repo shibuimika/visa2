@@ -1,44 +1,23 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppStore } from '../../../stores/appStore';
 import { SpecificSkill2Info, ProcedureType } from '../../../types';
 
-// バリデーションスキーマ
-const createSchema = (procedureType: ProcedureType) => {
-  if (procedureType === 'renewal') {
-    return z.object({
-      employmentCertificate: z.string().min(1, '在職証明書は必須です'),
-      salarySlip: z.string().min(1, '給与明細は必須です'),
-      taxCertificate: z.string().min(1, '納税証明書は必須です'),
-    });
-  } else if (procedureType === 'change') {
-    return z.object({
-      workExperienceCertificate: z.string().optional(),
-      skillTestCertificate: z.string().optional(),
-      employmentContract: z.string().min(1, '雇用契約書は必須です'),
-      organizationInfo: z.string().min(1, '所属機関情報は必須です'),
-    }).refine(
-      (data) => data.workExperienceCertificate || data.skillTestCertificate,
-      {
-        message: '実務経験証明または技能試験合格証のいずれかは必須です',
-        path: ['workExperienceCertificate'],
-      }
-    );
-  }
-  
-  // デフォルトスキーマ
-  return z.object({
-    employmentCertificate: z.string().optional(),
-    salarySlip: z.string().optional(),
-    taxCertificate: z.string().optional(),
-    workExperienceCertificate: z.string().optional(),
-    skillTestCertificate: z.string().optional(),
-    employmentContract: z.string().optional(),
-    organizationInfo: z.string().optional(),
-  });
-};
+// Zodスキーマとインターフェースの型を一致させる
+const fileOrStringSchema = z.instanceof(File).or(z.string()).optional();
+
+// バリデーションスキーマ - SpecificSkill2Infoインターフェースと完全に一致させる
+const schema = z.object({
+  employmentCertificate: fileOrStringSchema,
+  salarySlip: fileOrStringSchema,
+  taxCertificate: fileOrStringSchema,
+  workExperienceCertificate: fileOrStringSchema,
+  skillTestCertificate: fileOrStringSchema,
+  employmentContract: fileOrStringSchema,
+  organizationInfo: z.string().optional(),
+});
 
 interface SpecificSkill2FormProps {
   onNext: () => void;
@@ -47,14 +26,98 @@ interface SpecificSkill2FormProps {
 
 const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack }) => {
   const { formData, survey, updateFormData } = useAppStore();
-  
+  const fileInputRefs = {
+    employmentCertificate: useRef<HTMLInputElement>(null),
+    salarySlip: useRef<HTMLInputElement>(null),
+    taxCertificate: useRef<HTMLInputElement>(null),
+    workExperienceCertificate: useRef<HTMLInputElement>(null),
+    skillTestCertificate: useRef<HTMLInputElement>(null),
+    employmentContract: useRef<HTMLInputElement>(null),
+  };
+
+  // ファイルプレビュー状態
+  const [filePreviews, setFilePreviews] = useState<{
+    employmentCertificate?: string;
+    salarySlip?: string;
+    taxCertificate?: string;
+    workExperienceCertificate?: string;
+    skillTestCertificate?: string;
+    employmentContract?: string;
+  }>({
+    employmentCertificate: typeof formData.specificSkill2Info?.employmentCertificate === 'string'
+      ? formData.specificSkill2Info.employmentCertificate
+      : undefined,
+    salarySlip: typeof formData.specificSkill2Info?.salarySlip === 'string'
+      ? formData.specificSkill2Info.salarySlip
+      : undefined,
+    taxCertificate: typeof formData.specificSkill2Info?.taxCertificate === 'string'
+      ? formData.specificSkill2Info.taxCertificate
+      : undefined,
+    workExperienceCertificate: typeof formData.specificSkill2Info?.workExperienceCertificate === 'string'
+      ? formData.specificSkill2Info.workExperienceCertificate
+      : undefined,
+    skillTestCertificate: typeof formData.specificSkill2Info?.skillTestCertificate === 'string'
+      ? formData.specificSkill2Info.skillTestCertificate
+      : undefined,
+    employmentContract: typeof formData.specificSkill2Info?.employmentContract === 'string'
+      ? formData.specificSkill2Info.employmentContract
+      : undefined,
+  });
+
+  const [uploadErrors, setUploadErrors] = useState<{[key: string]: string}>({});
+
+  // ファイル処理関数
+  const handleFileChange = (
+    fieldName: keyof typeof fileInputRefs,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    setUploadErrors(prev => ({ ...prev, [fieldName]: '' }));
+
+    if (!file) return;
+
+    // ファイルサイズチェック（10MB以下）
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'ファイルサイズは10MB以下にしてください' }));
+      return;
+    }
+
+    // ファイル形式チェック（PDF, JPG, PNG）
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'PDF、JPG、PNGファイルを選択してください' }));
+      return;
+    }
+
+    // 画像をBase64に変換してプレビュー表示
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setFilePreviews(prev => ({ ...prev, [fieldName]: dataUrl }));
+      setValue(fieldName, dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = (fieldName: keyof typeof fileInputRefs) => {
+    setFilePreviews(prev => ({ ...prev, [fieldName]: undefined }));
+    setValue(fieldName, '');
+    if (fileInputRefs[fieldName].current) {
+      fileInputRefs[fieldName].current!.value = '';
+    }
+  };
+
   // surveyの初期値を設定してhooksが条件付きで呼ばれないようにする
   const currentSurvey = survey || { procedureType: 'renewal' as ProcedureType, visaType: 'specific-2' as any };
-  const schema = createSchema(currentSurvey.procedureType);
-  
+
+  // 条件分岐による必須チェック（UI側で制御）
+  const isRenewal = currentSurvey.procedureType === 'renewal';
+
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<SpecificSkill2Info>({
     resolver: zodResolver(schema),
@@ -64,10 +127,145 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
   // survey が存在しない場合のみ早期リターン
   if (!survey) return null;
 
+  // フォームの現在の値を取得
+  const watchedValues = watch();
+
+  // 次へ進むボタンの有効化チェック
+  const isNextButtonEnabled = () => {
+    const { procedureType } = survey;
+
+    if (procedureType === 'renewal') {
+      // 更新時は在職証明書、給与明細、納税証明書が必須
+      return !!(
+        watchedValues.employmentCertificate &&
+        watchedValues.salarySlip &&
+        watchedValues.taxCertificate
+      );
+    } else if (procedureType === 'change') {
+      // 変更時は実務経験証明または技能試験合格証、雇用契約書が必須
+      return !!(
+        (watchedValues.workExperienceCertificate || watchedValues.skillTestCertificate) &&
+        watchedValues.employmentContract
+      );
+    }
+
+    return false;
+  };
+
+  // 必須フィールドのチェック関数
+  const validateRequiredFields = (data: SpecificSkill2Info) => {
+    const { procedureType } = survey;
+    const errors: string[] = [];
+
+    if (procedureType === 'renewal') {
+      // 更新時は在職証明書、給与明細、納税証明書が必須
+      if (!data.employmentCertificate) {
+        errors.push('在職証明書');
+      }
+      if (!data.salarySlip) {
+        errors.push('給与明細');
+      }
+      if (!data.taxCertificate) {
+        errors.push('納税証明書');
+      }
+    } else if (procedureType === 'change') {
+      // 変更時は実務経験証明または技能試験合格証、雇用契約書が必須
+      if (!data.workExperienceCertificate && !data.skillTestCertificate) {
+        errors.push('実務経験証明または技能試験合格証のいずれか');
+      }
+      if (!data.employmentContract) {
+        errors.push('雇用契約書');
+      }
+    }
+
+    return errors;
+  };
+
   const onSubmit = (data: SpecificSkill2Info) => {
+    const validationErrors = validateRequiredFields(data);
+    if (validationErrors.length > 0) {
+      alert(`以下の項目は必須です：\n${validationErrors.join('\n')}`);
+      return;
+    }
     updateFormData({ specificSkill2Info: data });
     onNext();
   };
+
+  // ファイルアップロードフィールドコンポーネント
+  const FileUploadField: React.FC<{
+    label: string;
+    fieldName: keyof typeof fileInputRefs;
+    required?: boolean;
+    placeholder?: string;
+  }> = ({ label, fieldName, required = false, placeholder }) => (
+    <div>
+      <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700 mb-1">
+        {required && <span className="text-red-500">*</span>} {label}
+      </label>
+
+      {/* ファイルプレビュー */}
+      <div className="flex flex-col items-center space-y-4 mb-4">
+        {filePreviews[fieldName] ? (
+          <div className="relative">
+            {filePreviews[fieldName]?.startsWith('data:image/') ? (
+              <img
+                src={filePreviews[fieldName]}
+                alt={`${label}プレビュー`}
+                className="w-32 h-40 object-cover border-2 border-gray-300 rounded-md"
+              />
+            ) : (
+              <div className="w-32 h-40 border-2 border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs text-gray-500 mt-1">PDFファイル</p>
+                </div>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => removeFile(fieldName)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <div className="w-32 h-40 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              <p className="text-xs text-gray-500 mt-1">ファイルなし</p>
+            </div>
+          </div>
+        )}
+
+        {/* ファイル選択ボタン */}
+        <div>
+          <input
+            ref={fileInputRefs[fieldName]}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileChange(fieldName, e)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRefs[fieldName].current?.click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+          >
+            {filePreviews[fieldName] ? 'ファイルを変更' : 'ファイルを選択'}
+          </button>
+        </div>
+      </div>
+
+      {uploadErrors[fieldName] && (
+        <p className="mt-2 text-sm text-red-600">{uploadErrors[fieldName]}</p>
+      )}
+    </div>
+  );
 
   const renderFormFields = () => {
     const { procedureType } = survey;
@@ -75,53 +273,23 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
     if (procedureType === 'renewal') {
       return (
         <>
-          <div>
-            <label htmlFor="employmentCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              在職証明書 *
-            </label>
-            <textarea
-              {...register('employmentCertificate')}
-              id="employmentCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="在職証明書の詳細を入力してください"
-            />
-            {errors.employmentCertificate && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.employmentCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="在職証明書"
+            fieldName="employmentCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="salarySlip" className="block text-sm font-medium text-gray-700 mb-1">
-              給与明細 *
-            </label>
-            <textarea
-              {...register('salarySlip')}
-              id="salarySlip"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="直近の給与明細について入力してください"
-            />
-            {errors.salarySlip && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.salarySlip.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="給与明細"
+            fieldName="salarySlip"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="taxCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              納税証明書 *
-            </label>
-            <textarea
-              {...register('taxCertificate')}
-              id="taxCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="納税証明書の情報を入力してください"
-            />
-            {errors.taxCertificate && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.taxCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="納税証明書"
+            fieldName="taxCertificate"
+            required={true}
+          />
         </>
       );
     } else if (procedureType === 'change') {
@@ -133,53 +301,23 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
             </p>
           </div>
 
-          <div>
-            <label htmlFor="workExperienceCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              実務経験証明 *（いずれか必須）
-            </label>
-            <textarea
-              {...register('workExperienceCertificate')}
-              id="workExperienceCertificate"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="5年以上の実務経験に関する証明書の内容を入力してください"
-            />
-            {errors.workExperienceCertificate && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.workExperienceCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="実務経験証明（いずれか必須）"
+            fieldName="workExperienceCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="skillTestCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-              技能試験合格証 *（いずれか必須）
-            </label>
-            <textarea
-              {...register('skillTestCertificate')}
-              id="skillTestCertificate"
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="特定技能2号技能試験の合格証について入力してください"
-            />
-            {errors.skillTestCertificate && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.skillTestCertificate.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="技能試験合格証（いずれか必須）"
+            fieldName="skillTestCertificate"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="employmentContract" className="block text-sm font-medium text-gray-700 mb-1">
-              雇用契約書 *
-            </label>
-            <textarea
-              {...register('employmentContract')}
-              id="employmentContract"
-              rows={4}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="特定技能2号雇用契約書の内容を入力してください（職種、報酬、勤務時間等）"
-            />
-            {errors.employmentContract && (
-              <p className="text-red-600 text-sm mt-1">{String(errors.employmentContract.message)}</p>
-            )}
-          </div>
+          <FileUploadField
+            label="雇用契約書"
+            fieldName="employmentContract"
+            required={true}
+          />
 
           <div>
             <label htmlFor="organizationInfo" className="block text-sm font-medium text-gray-700 mb-1">
@@ -242,7 +380,12 @@ const SpecificSkill2Form: React.FC<SpecificSkill2FormProps> = ({ onNext, onBack 
 
           <button
             type="submit"
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={!isNextButtonEnabled()}
+            className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isNextButtonEnabled()
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
           >
             次へ
           </button>

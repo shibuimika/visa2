@@ -1,35 +1,20 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppStore } from '../../../stores/appStore';
 import { FamilyStayInfo, ProcedureType } from '../../../types';
 
-// バリデーションスキーマ
-const createSchema = (procedureType: ProcedureType) => {
-  if (procedureType === 'renewal') {
-    return z.object({
-      relationshipCertificate: z.string().min(1, '関係証明書は必須です'),
-      incomeCertificate: z.string().min(1, '収入証明書は必須です'),
-      residenceRecord: z.string().min(1, '住民票は必須です'),
-    });
-  } else if (procedureType === 'change') {
-    return z.object({
-      relationshipCertificate: z.string().min(1, '関係証明書は必須です'),
-      incomeCertificate: z.string().min(1, '収入証明書は必須です'),
-      residenceRecord: z.string().min(1, '住民票は必須です'),
-      currentVisaInfo: z.string().min(1, '現資格情報は必須です'),
-    });
-  }
-  
-  // デフォルトスキーマ
-  return z.object({
-    relationshipCertificate: z.string().optional(),
-    incomeCertificate: z.string().optional(),
-    residenceRecord: z.string().optional(),
-    currentVisaInfo: z.string().optional(),
-  });
-};
+// Zodスキーマとインターフェースの型を一致させる
+const fileOrStringSchema = z.instanceof(File).or(z.string()).optional();
+
+// バリデーションスキーマ - FamilyStayInfoインターフェースと完全に一致させる
+const schema = z.object({
+  relationshipCertificate: fileOrStringSchema,
+  incomeCertificate: fileOrStringSchema,
+  residenceRecord: fileOrStringSchema,
+  currentVisaInfo: z.string().optional(),
+});
 
 interface FamilyStayFormProps {
   onNext: () => void;
@@ -38,14 +23,83 @@ interface FamilyStayFormProps {
 
 const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
   const { formData, survey, updateFormData } = useAppStore();
-  
+  const fileInputRefs = {
+    relationshipCertificate: useRef<HTMLInputElement>(null),
+    incomeCertificate: useRef<HTMLInputElement>(null),
+    residenceRecord: useRef<HTMLInputElement>(null),
+  };
+
+  // ファイルプレビュー状態
+  const [filePreviews, setFilePreviews] = useState<{
+    relationshipCertificate?: string;
+    incomeCertificate?: string;
+    residenceRecord?: string;
+  }>({
+    relationshipCertificate: typeof formData.familyStayInfo?.relationshipCertificate === 'string'
+      ? formData.familyStayInfo.relationshipCertificate
+      : undefined,
+    incomeCertificate: typeof formData.familyStayInfo?.incomeCertificate === 'string'
+      ? formData.familyStayInfo.incomeCertificate
+      : undefined,
+    residenceRecord: typeof formData.familyStayInfo?.residenceRecord === 'string'
+      ? formData.familyStayInfo.residenceRecord
+      : undefined,
+  });
+
+  const [uploadErrors, setUploadErrors] = useState<{[key: string]: string}>({});
+
+  // ファイル処理関数
+  const handleFileChange = (
+    fieldName: keyof typeof fileInputRefs,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    setUploadErrors(prev => ({ ...prev, [fieldName]: '' }));
+
+    if (!file) return;
+
+    // ファイルサイズチェック（10MB以下）
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'ファイルサイズは10MB以下にしてください' }));
+      return;
+    }
+
+    // ファイル形式チェック（PDF, JPG, PNG）
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadErrors(prev => ({ ...prev, [fieldName]: 'PDF、JPG、PNGファイルを選択してください' }));
+      return;
+    }
+
+    // 画像をBase64に変換してプレビュー表示
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setFilePreviews(prev => ({ ...prev, [fieldName]: dataUrl }));
+      setValue(fieldName, dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeFile = (fieldName: keyof typeof fileInputRefs) => {
+    setFilePreviews(prev => ({ ...prev, [fieldName]: undefined }));
+    setValue(fieldName, '');
+    if (fileInputRefs[fieldName].current) {
+      fileInputRefs[fieldName].current!.value = '';
+    }
+  };
+
   // surveyの初期値を設定してhooksが条件付きで呼ばれないようにする
   const currentSurvey = survey || { procedureType: 'renewal' as ProcedureType, visaType: 'family' as any };
-  const schema = createSchema(currentSurvey.procedureType);
-  
+
+  // 条件分岐による必須チェック（UI側で制御）
+  const isRenewal = currentSurvey.procedureType === 'renewal';
+
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<FamilyStayInfo>({
     resolver: zodResolver(schema),
@@ -55,63 +109,176 @@ const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
   // survey が存在しない場合のみ早期リターン
   if (!survey) return null;
 
+  // フォームの現在の値を取得
+  const watchedValues = watch();
+
+  // 次へ進むボタンの有効化チェック
+  const isNextButtonEnabled = () => {
+    const { procedureType } = survey;
+
+    if (procedureType === 'renewal') {
+      // 更新時は関係証明書、収入証明書、在留記録が必須
+      return !!(
+        watchedValues.relationshipCertificate &&
+        watchedValues.incomeCertificate &&
+        watchedValues.residenceRecord
+      );
+    } else if (procedureType === 'change') {
+      // 変更時は関係証明書、収入証明書、在留記録、現資格情報が必須
+      return !!(
+        watchedValues.relationshipCertificate &&
+        watchedValues.incomeCertificate &&
+        watchedValues.residenceRecord &&
+        watchedValues.currentVisaInfo && watchedValues.currentVisaInfo.trim() !== ''
+      );
+    }
+
+    return false;
+  };
+
+  // 必須フィールドのチェック関数
+  const validateRequiredFields = (data: FamilyStayInfo) => {
+    const { procedureType } = survey;
+    const errors: string[] = [];
+
+    if (procedureType === 'renewal') {
+      // 更新時は関係証明書、収入証明書、在留記録が必須
+      if (!data.relationshipCertificate) {
+        errors.push('関係証明書');
+      }
+      if (!data.incomeCertificate) {
+        errors.push('収入証明書');
+      }
+      if (!data.residenceRecord) {
+        errors.push('住民票');
+      }
+    } else if (procedureType === 'change') {
+      // 変更時は関係証明書、収入証明書、在留記録、現資格情報が必須
+      if (!data.relationshipCertificate) {
+        errors.push('関係証明書');
+      }
+      if (!data.incomeCertificate) {
+        errors.push('収入証明書');
+      }
+      if (!data.residenceRecord) {
+        errors.push('住民票');
+      }
+      if (!data.currentVisaInfo || data.currentVisaInfo.trim() === '') {
+        errors.push('現資格情報');
+      }
+    }
+
+    return errors;
+  };
+
   const onSubmit = (data: FamilyStayInfo) => {
+    const validationErrors = validateRequiredFields(data);
+    if (validationErrors.length > 0) {
+      alert(`以下の項目は必須です：\n${validationErrors.join('\n')}`);
+      return;
+    }
     updateFormData({ familyStayInfo: data });
     onNext();
   };
+
+  // ファイルアップロードフィールドコンポーネント
+  const FileUploadField: React.FC<{
+    label: string;
+    fieldName: keyof typeof fileInputRefs;
+    required?: boolean;
+    placeholder?: string;
+  }> = ({ label, fieldName, required = false, placeholder }) => (
+    <div>
+      <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700 mb-1">
+        {required && <span className="text-red-500">*</span>} {label}
+      </label>
+
+      {/* ファイルプレビュー */}
+      <div className="flex flex-col items-center space-y-4 mb-4">
+        {filePreviews[fieldName] ? (
+          <div className="relative">
+            {filePreviews[fieldName]?.startsWith('data:image/') ? (
+              <img
+                src={filePreviews[fieldName]}
+                alt={`${label}プレビュー`}
+                className="w-32 h-40 object-cover border-2 border-gray-300 rounded-md"
+              />
+            ) : (
+              <div className="w-32 h-40 border-2 border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-xs text-gray-500 mt-1">PDFファイル</p>
+                </div>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => removeFile(fieldName)}
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <div className="w-32 h-40 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              <p className="text-xs text-gray-500 mt-1">ファイルなし</p>
+            </div>
+          </div>
+        )}
+
+        {/* ファイル選択ボタン */}
+        <div>
+          <input
+            ref={fileInputRefs[fieldName]}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => handleFileChange(fieldName, e)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRefs[fieldName].current?.click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+          >
+            {filePreviews[fieldName] ? 'ファイルを変更' : 'ファイルを選択'}
+          </button>
+        </div>
+      </div>
+
+      {uploadErrors[fieldName] && (
+        <p className="mt-2 text-sm text-red-600">{uploadErrors[fieldName]}</p>
+      )}
+    </div>
+  );
 
   const renderFormFields = () => {
     const { procedureType } = survey;
     
     return (
       <>
-        <div>
-          <label htmlFor="relationshipCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-            関係証明書 *
-          </label>
-          <textarea
-            {...register('relationshipCertificate')}
-            id="relationshipCertificate"
-            rows={4}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="扶養者との関係を証明する書類について入力してください（結婚証明書、出生証明書等）"
-          />
-          {errors.relationshipCertificate && (
-            <p className="text-red-600 text-sm mt-1">{String(errors.relationshipCertificate.message)}</p>
-          )}
-        </div>
+        <FileUploadField
+          label="関係証明書"
+          fieldName="relationshipCertificate"
+          required={true}
+        />
 
-        <div>
-          <label htmlFor="incomeCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-            収入証明書 *
-          </label>
-          <textarea
-            {...register('incomeCertificate')}
-            id="incomeCertificate"
-            rows={4}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="扶養者の収入を証明する書類について入力してください（給与明細、源泉徴収票等）"
-          />
-          {errors.incomeCertificate && (
-            <p className="text-red-600 text-sm mt-1">{String(errors.incomeCertificate.message)}</p>
-          )}
-        </div>
+        <FileUploadField
+          label="収入証明書"
+          fieldName="incomeCertificate"
+          required={true}
+        />
 
-        <div>
-          <label htmlFor="residenceRecord" className="block text-sm font-medium text-gray-700 mb-1">
-            住民票 *
-          </label>
-          <textarea
-            {...register('residenceRecord')}
-            id="residenceRecord"
-            rows={3}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="家族全員が記載された住民票について入力してください"
-          />
-          {errors.residenceRecord && (
-            <p className="text-red-600 text-sm mt-1">{String(errors.residenceRecord.message)}</p>
-          )}
-        </div>
+        <FileUploadField
+          label="住民票"
+          fieldName="residenceRecord"
+          required={true}
+        />
 
         {procedureType === 'change' && (
           <div>
@@ -130,8 +297,6 @@ const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
             )}
           </div>
         )}
-
-
       </>
     );
   };
@@ -205,7 +370,12 @@ const FamilyStayForm: React.FC<FamilyStayFormProps> = ({ onNext, onBack }) => {
 
           <button
             type="submit"
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={!isNextButtonEnabled()}
+            className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isNextButtonEnabled()
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
           >
             次へ
           </button>

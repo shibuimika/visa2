@@ -106,71 +106,69 @@ export interface PhotoUpload {
 // 条件付きフォーム - 技人国
 export interface EngineerHumanitiesInfo {
   // 更新時
-  employmentCertificate?: string; // 在職証明書
-  salarySlip?: string; // 給与明細
-  taxCertificate?: string; // 納税証明書
-  
-  // 変更時
-  educationHistory?: string; // 学歴
-  workHistory?: string; // 職歴
-  graduationCertificate?: string; // 卒業証明書
-  employmentContract?: string; // 雇用契約書
-  companyInfo?: string; // 勤務先情報
-  
+  employmentCertificate?: File | string; // 在職証明書（ファイルまたはデータURL）
+  salarySlip?: File | string; // 給与明細（ファイルまたはデータURL）
+  taxCertificate?: File | string; // 納税証明書（ファイルまたはデータURL）
 
+  // 変更時
+  educationHistory?: string; // 学歴（テキスト入力）
+  workHistory?: string; // 職歴（テキスト入力）
+  graduationCertificate?: File | string; // 卒業証明書（ファイルまたはデータURL）
+  employmentContract?: File | string; // 雇用契約書（ファイルまたはデータURL）
+  companyInfo?: string; // 勤務先情報（テキスト入力）
 }
 
 // 条件付きフォーム - 特定技能1号
 export interface SpecificSkill1Info {
   // 更新時
-  employmentCertificate?: string; // 在職証明書
-  salarySlip?: string; // 給与明細
-  supportReport?: string; // 支援状況報告書
-  taxCertificate?: string; // 納税証明書
-  
+  employmentCertificate?: File | string; // 在職証明書（ファイルまたはデータURL）
+  salarySlip?: File | string; // 給与明細（ファイルまたはデータURL）
+  supportReport?: File | string; // 支援状況報告書（ファイルまたはデータURL）
+  taxCertificate?: File | string; // 納税証明書（ファイルまたはデータURL）
+
   // 変更時
-  skillTestCertificate?: string; // 評価試験合格証
-  supportPlan?: string; // 支援計画書
-  employmentContract?: string; // 雇用契約書
+  skillTestCertificate?: File | string; // 評価試験合格証（ファイルまたはデータURL）
+  supportPlan?: File | string; // 支援計画書（ファイルまたはデータURL）
+  employmentContract?: File | string; // 雇用契約書（ファイルまたはデータURL）
 }
 
 // 条件付きフォーム - 特定技能2号
 export interface SpecificSkill2Info {
   // 更新時
-  employmentCertificate?: string; // 在職証明書
-  salarySlip?: string; // 給与明細
-  taxCertificate?: string; // 納税証明書
-  
+  employmentCertificate?: File | string; // 在職証明書（ファイルまたはデータURL）
+  salarySlip?: File | string; // 給与明細（ファイルまたはデータURL）
+  taxCertificate?: File | string; // 納税証明書（ファイルまたはデータURL）
+
   // 変更時
-  workExperienceCertificate?: string; // 実務経験証明
-  skillTestCertificate?: string; // 技能試験合格証
-  employmentContract?: string; // 雇用契約書
-  organizationInfo?: string; // 所属機関情報
+  workExperienceCertificate?: File | string; // 実務経験証明（ファイルまたはデータURL）
+  skillTestCertificate?: File | string; // 技能試験合格証（ファイルまたはデータURL）
+  employmentContract?: File | string; // 雇用契約書（ファイルまたはデータURL）
+  organizationInfo?: string; // 所属機関情報（テキスト入力）
 }
 
 // 条件付きフォーム - 留学
 export interface StudentInfo {
   // 更新時
-  enrollmentCertificate?: string; // 在学証明書
-  transcript?: string; // 成績証明書
-  attendanceCertificate?: string; // 出席証明書
-  tuitionPaymentCertificate?: string; // 学費納入証明書
-  
+  enrollmentCertificate?: File | string; // 在学証明書（ファイルまたはデータURL）
+  transcript?: File | string; // 成績証明書（ファイルまたはデータURL）
+  attendanceCertificate?: File | string; // 出席証明書（ファイルまたはデータURL）
+  tuitionPaymentCertificate?: File | string; // 学費納入証明書（ファイルまたはデータURL）
+
   // 変更時
-  graduationCertificate?: string; // 卒業証明書
-  employmentContract?: string; // 雇用契約書
-  companyInfo?: string; // 勤務先情報
+  graduationCertificate?: File | string; // 卒業証明書（ファイルまたはデータURL）
+  employmentContract?: File | string; // 雇用契約書（ファイルまたはデータURL）
+  companyInfo?: string; // 勤務先情報（テキスト入力）
 }
 
 // 条件付きフォーム - 家族滞在
 export interface FamilyStayInfo {
   // 更新時（配偶者・子・その他）
-  relationshipCertificate?: string; // 関係証明書
-  incomeCertificate?: string; // 収入証明書
-  residenceRecord?: string; // 住民票
-  
+  relationshipCertificate?: File | string; // 関係証明書（ファイルまたはデータURL）
+  incomeCertificate?: File | string; // 収入証明書（ファイルまたはデータURL）
+  residenceRecord?: File | string; // 住民票（ファイルまたはデータURL）
+
   // 変更時
-  currentVisaInfo?: string; // 現資格情報
+  currentVisaInfo?: string; // 現資格情報（テキスト入力）
 }
 
 // フォームデータ全体

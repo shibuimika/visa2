@@ -15,7 +15,7 @@ const familyMemberSchema = z.object({
 });
 
 const familyInfoSchema = z.object({
-  hasFamily: z.string().min(1, '在日親族・同居者の有無は必須です'),
+  hasFamily: z.string().optional(),
   familyMembers: z.array(familyMemberSchema).optional(),
 });
 
@@ -50,9 +50,53 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
   });
 
   const hasFamily = watch('hasFamily');
+  const watchedValues = watch();
+
+  // 次へ進むボタンの有効化チェック
+  const isNextButtonEnabled = () => {
+    // hasFamilyが選択されていない場合は無効
+    if (!watchedValues.hasFamily) {
+      return false;
+    }
+
+    // 「はい」を選択した場合のみ、familyMembersのチェックを行う
+    if (watchedValues.hasFamily === 'yes') {
+      const hasValidMembers = watchedValues.familyMembers && watchedValues.familyMembers.length > 0 &&
+        watchedValues.familyMembers.some(member =>
+          member.name.trim() !== '' ||
+          member.relationship !== '' ||
+          member.nationality.trim() !== ''
+        );
+      return hasValidMembers;
+    }
+
+    // 「いいえ」を選択した場合は有効
+    return true;
+  };
 
   const onSubmit = (data: FamilyInfoFormData) => {
-    updateFormData({ familyInfo: data });
+    // 「はい」を選択した場合のみ、familyMembersのバリデーションを行う
+    if (data.hasFamily === 'yes') {
+      const hasValidMembers = data.familyMembers && data.familyMembers.length > 0 &&
+        data.familyMembers.some(member =>
+          member.name.trim() !== '' ||
+          member.relationship !== '' ||
+          member.nationality.trim() !== ''
+        );
+
+      if (!hasValidMembers) {
+        alert('親族・同居者の情報を少なくとも1人入力してください。');
+        return;
+      }
+    }
+
+    // 「いいえ」を選択した場合、または未選択の場合はfamilyMembersをクリア
+    const processedData = {
+      ...data,
+      familyMembers: data.hasFamily === 'yes' ? data.familyMembers : [],
+    };
+
+    updateFormData({ familyInfo: processedData });
     onNext();
   };
 
@@ -75,7 +119,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
         {/* 在日親族・同居者の有無 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
-            <span className="text-red-500">*</span> 日本に親族または同居者はいますか？
+            日本に親族または同居者はいますか？
           </label>
           <div className="space-y-3">
             <label className="flex items-center">
@@ -137,7 +181,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
                   {/* 氏名 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-red-500">*</span> 氏名
+                      {hasFamily === 'yes' && <span className="text-red-500">*</span>} 氏名
                     </label>
                     <input
                       type="text"
@@ -155,7 +199,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
                   {/* 続柄 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-red-500">*</span> 続柄
+                      {hasFamily === 'yes' && <span className="text-red-500">*</span>} 続柄
                     </label>
                     <select
                       {...register(`familyMembers.${index}.relationship`)}
@@ -180,7 +224,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
                   {/* 国籍 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <span className="text-red-500">*</span> 国籍
+                      {hasFamily === 'yes' && <span className="text-red-500">*</span>} 国籍
                     </label>
                     <input
                       type="text"
@@ -251,7 +295,12 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
           
           <button
             type="submit"
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            disabled={!isNextButtonEnabled()}
+            className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isNextButtonEnabled()
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
           >
             {t('common.next')}
           </button>

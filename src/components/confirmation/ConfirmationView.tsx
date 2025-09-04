@@ -54,13 +54,25 @@ const ConfirmationView: React.FC = () => {
     </div>
   );
 
-  const DataRow: React.FC<{ label: string; value: string | undefined }> = ({ label, value }) => (
+  // 値の表示用ヘルパー関数
+  const formatValue = (value: string | File | undefined): string => {
+    if (!value) return '未入力';
+    if (value instanceof File) {
+      return `${value.name} (${(value.size / 1024 / 1024).toFixed(2)}MB)`;
+    }
+    if (value.length > 50) {
+      return value.substring(0, 50) + '...';
+    }
+    return value;
+  };
+
+  const DataRow: React.FC<{ label: string; value: string | File | undefined }> = ({ label, value }) => (
     <div className="flex justify-between items-center py-3 px-4 bg-gray-50/50 rounded-lg border border-gray-100 last:border-b-0 hover:bg-gray-100/50 transition-colors duration-150">
       <span className="text-sm sm:text-base font-medium text-gray-700">{label}:</span>
       <span className={`text-sm sm:text-base font-semibold ${
-        value && value !== '未入力' ? 'text-gray-900' : 'text-gray-400 italic'
+        value ? 'text-gray-900' : 'text-gray-400 italic'
       }`}>
-        {value || '未入力'}
+        {formatValue(value)}
       </span>
     </div>
   );
@@ -229,10 +241,10 @@ const ConfirmationView: React.FC = () => {
         <InfoSection title="技術・人文知識・国際業務情報" onEdit={() => handleEdit('engineer')}>
           <div className="space-y-2">
             {formData.engineerHumanitiesInfo.employmentCertificate && (
-              <DataRow label="在職証明書" value={formData.engineerHumanitiesInfo.employmentCertificate.substring(0, 50) + '...'} />
+              <DataRow label="在職証明書" value={formData.engineerHumanitiesInfo.employmentCertificate} />
             )}
             {formData.engineerHumanitiesInfo.educationHistory && (
-              <DataRow label="学歴" value={formData.engineerHumanitiesInfo.educationHistory.substring(0, 50) + '...'} />
+              <DataRow label="学歴" value={formData.engineerHumanitiesInfo.educationHistory} />
             )}
 
           </div>
@@ -243,10 +255,10 @@ const ConfirmationView: React.FC = () => {
         <InfoSection title="特定技能1号情報" onEdit={() => handleEdit('specific1')}>
           <div className="space-y-2">
             {formData.specificSkill1Info.skillTestCertificate && (
-              <DataRow label="評価試験合格証" value={formData.specificSkill1Info.skillTestCertificate.substring(0, 50) + '...'} />
+              <DataRow label="評価試験合格証" value={formData.specificSkill1Info.skillTestCertificate} />
             )}
             {formData.specificSkill1Info.supportPlan && (
-              <DataRow label="支援計画書" value={formData.specificSkill1Info.supportPlan.substring(0, 50) + '...'} />
+              <DataRow label="支援計画書" value={formData.specificSkill1Info.supportPlan} />
             )}
           </div>
         </InfoSection>
@@ -256,10 +268,10 @@ const ConfirmationView: React.FC = () => {
         <InfoSection title="特定技能2号情報" onEdit={() => handleEdit('specific2')}>
           <div className="space-y-2">
             {formData.specificSkill2Info.workExperienceCertificate && (
-              <DataRow label="実務経験証明" value={formData.specificSkill2Info.workExperienceCertificate.substring(0, 50) + '...'} />
+              <DataRow label="実務経験証明" value={formData.specificSkill2Info.workExperienceCertificate} />
             )}
             {formData.specificSkill2Info.skillTestCertificate && (
-              <DataRow label="技能試験合格証" value={formData.specificSkill2Info.skillTestCertificate.substring(0, 50) + '...'} />
+              <DataRow label="技能試験合格証" value={formData.specificSkill2Info.skillTestCertificate} />
             )}
           </div>
         </InfoSection>
@@ -269,7 +281,7 @@ const ConfirmationView: React.FC = () => {
         <InfoSection title="留学情報" onEdit={() => handleEdit('student')}>
           <div className="space-y-2">
             {formData.studentInfo.enrollmentCertificate && (
-              <DataRow label="在学証明書" value={formData.studentInfo.enrollmentCertificate.substring(0, 50) + '...'} />
+              <DataRow label="在学証明書" value={formData.studentInfo.enrollmentCertificate} />
             )}
 
           </div>
@@ -280,7 +292,7 @@ const ConfirmationView: React.FC = () => {
         <InfoSection title="家族滞在情報" onEdit={() => handleEdit('family-stay')}>
           <div className="space-y-2">
             {formData.familyStayInfo.relationshipCertificate && (
-              <DataRow label="関係証明書" value={formData.familyStayInfo.relationshipCertificate.substring(0, 50) + '...'} />
+              <DataRow label="関係証明書" value={formData.familyStayInfo.relationshipCertificate} />
             )}
 
           </div>
