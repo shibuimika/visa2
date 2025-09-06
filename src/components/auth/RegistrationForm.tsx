@@ -79,7 +79,7 @@ const RegistrationForm: React.FC = () => {
 
   return (
     <div className="min-h-full">
-      <div className="max-w-2xl mx-auto p-6 sm:p-8 lg:p-10">
+      <div className="max-w-2xl mx-auto p-3 sm:p-6 lg:p-8">
         <div className="text-center mb-6 sm:mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ const RegistrationForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* 言語選択 */}
             <div>
@@ -217,7 +217,7 @@ const RegistrationForm: React.FC = () => {
           </div>
 
         {/* 注意事項 */}
-        <div className="mt-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200/60 p-4 sm:p-6 shadow-sm">
+        <div className="mt-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-200/60 p-3 sm:p-4 shadow-sm">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
