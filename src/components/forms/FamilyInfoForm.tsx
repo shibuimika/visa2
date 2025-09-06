@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,7 +15,7 @@ const familyMemberSchema = z.object({
 });
 
 const familyInfoSchema = z.object({
-  hasFamily: z.string().optional(),
+  hasFamily: z.string().min(1, '選択してください'),
   familyMembers: z.array(familyMemberSchema).optional(),
 });
 
@@ -36,6 +36,7 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
     watch,
     control,
     formState: { errors },
+    setValue,
   } = useForm<FamilyInfoFormData>({
     resolver: zodResolver(familyInfoSchema),
     defaultValues: {
@@ -44,13 +45,21 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
     },
   });
 
+  const hasFamily = watch('hasFamily');
+  const watchedValues = watch();
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'familyMembers',
   });
 
-  const hasFamily = watch('hasFamily');
-  const watchedValues = watch();
+  // hasFamilyの値が変更されたらfamilyMembersを適切に設定
+  useEffect(() => {
+    if (hasFamily === 'no') {
+      // 「いいえ」を選択したらfamilyMembersを空にする
+      setValue('familyMembers', []);
+    }
+  }, [hasFamily, setValue]);
 
   // 次へ進むボタンの有効化チェック
   const isNextButtonEnabled = () => {
@@ -59,30 +68,39 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
       return false;
     }
 
+    // 「いいえ」を選択した場合は常に有効
+    if (watchedValues.hasFamily === 'no') {
+      return true;
+    }
+
     // 「はい」を選択した場合のみ、familyMembersのチェックを行う
     if (watchedValues.hasFamily === 'yes') {
-      const hasValidMembers = watchedValues.familyMembers && watchedValues.familyMembers.length > 0 &&
-        watchedValues.familyMembers.some(member =>
-          member.name.trim() !== '' ||
-          member.relationship !== '' ||
-          member.nationality.trim() !== ''
-        );
+      // fieldsを使って現在のfamilyMembersの状態を確認
+      const hasValidMembers = fields && fields.length > 0 &&
+        fields.some((_, index) => {
+          const member = watchedValues.familyMembers?.[index];
+          return member &&
+                 member.name?.trim() !== '' &&
+                 member.relationship !== '' &&
+                 member.nationality?.trim() !== '';
+        });
       return hasValidMembers;
     }
 
-    // 「いいえ」を選択した場合は有効
-    return true;
+    return false;
   };
 
   const onSubmit = (data: FamilyInfoFormData) => {
     // 「はい」を選択した場合のみ、familyMembersのバリデーションを行う
     if (data.hasFamily === 'yes') {
-      const hasValidMembers = data.familyMembers && data.familyMembers.length > 0 &&
-        data.familyMembers.some(member =>
-          member.name.trim() !== '' ||
-          member.relationship !== '' ||
-          member.nationality.trim() !== ''
-        );
+      const hasValidMembers = fields && fields.length > 0 &&
+        fields.some((_, index) => {
+          const member = data.familyMembers?.[index];
+          return member &&
+                 member.name?.trim() !== '' &&
+                 member.relationship !== '' &&
+                 member.nationality?.trim() !== '';
+        });
 
       if (!hasValidMembers) {
         alert('親族・同居者の情報を少なくとも1人入力してください。');
@@ -105,17 +123,17 @@ const FamilyInfoForm: React.FC<FamilyInfoFormProps> = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="max-w-full sm:max-w-2xl mx-auto p-4 sm:p-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           在日親族・同居者情報
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           日本にいる親族や同居者の情報を入力してください
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
         {/* 在日親族・同居者の有無 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">

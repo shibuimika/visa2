@@ -374,7 +374,7 @@ const ConfirmationView: React.FC = () => {
 
       {/* 条件付きフォーム情報 */}
       {survey.visaType === 'engineer' && formData.engineerHumanitiesInfo && Object.keys(formData.engineerHumanitiesInfo).length > 0 && (
-        <InfoSection title={t('confirmation.engineerInfo')} onEdit={() => handleEdit('engineer')}>
+        <InfoSection title="必要書類" onEdit={() => handleEdit('engineer')}>
           <div className="space-y-4">
             {/* 更新時の必須項目 */}
             {survey.procedureType === 'renewal' && (
@@ -406,7 +406,7 @@ const ConfirmationView: React.FC = () => {
       )}
 
       {survey.visaType === 'specific-1' && formData.specificSkill1Info && Object.keys(formData.specificSkill1Info).length > 0 && (
-        <InfoSection title={t('confirmation.specificSkill1Info', '特定技能1号情報')} onEdit={() => handleEdit('specific1')}>
+        <InfoSection title="必要書類" onEdit={() => handleEdit('specific1')}>
           <div className="space-y-4">
             {/* 更新時の必須項目 */}
             {survey.procedureType === 'renewal' && (
@@ -431,7 +431,7 @@ const ConfirmationView: React.FC = () => {
       )}
 
       {survey.visaType === 'specific-2' && formData.specificSkill2Info && Object.keys(formData.specificSkill2Info).length > 0 && (
-        <InfoSection title={t('confirmation.specificSkill2Info', '特定技能2号情報')} onEdit={() => handleEdit('specific2')}>
+        <InfoSection title="必要書類" onEdit={() => handleEdit('specific2')}>
           <div className="space-y-4">
             {/* 更新時の必須項目 */}
             {survey.procedureType === 'renewal' && (
@@ -458,7 +458,7 @@ const ConfirmationView: React.FC = () => {
       )}
 
       {survey.visaType === 'student' && formData.studentInfo && Object.keys(formData.studentInfo).length > 0 && (
-        <InfoSection title={t('confirmation.studentInfo', '留学情報')} onEdit={() => handleEdit('student')}>
+        <InfoSection title="必要書類" onEdit={() => handleEdit('student')}>
           <div className="space-y-4">
             {/* 更新時の必須項目 */}
             {survey.procedureType === 'renewal' && (
@@ -485,7 +485,7 @@ const ConfirmationView: React.FC = () => {
       )}
 
       {survey.visaType === 'family' && formData.familyStayInfo && Object.keys(formData.familyStayInfo).length > 0 && (
-        <InfoSection title={t('confirmation.familyStayInfo', '家族滞在情報')} onEdit={() => handleEdit('family-stay')}>
+        <InfoSection title="必要書類" onEdit={() => handleEdit('family-stay')}>
           <div className="space-y-4">
             {/* 更新時の必須項目 */}
             {survey.procedureType === 'renewal' && (

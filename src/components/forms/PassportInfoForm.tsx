@@ -38,17 +38,17 @@ const PassportInfoForm: React.FC<PassportInfoFormProps> = ({ onNext, onBack }) =
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="max-w-full sm:max-w-2xl mx-auto p-4 sm:p-6">
+      <div className="text-center mb-6 sm:mb-8">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           {t('form.passport.title')}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           パスポートの情報を正確に入力してください
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
         {/* パスポート番号 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -146,14 +146,14 @@ const PassportInfoForm: React.FC<PassportInfoFormProps> = ({ onNext, onBack }) =
           <button
             type="button"
             onClick={onBack}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 order-2 sm:order-1"
           >
             {t('common.back')}
           </button>
-          
+
           <button
             type="submit"
-            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 order-1 sm:order-2"
           >
             {t('common.next')}
           </button>
