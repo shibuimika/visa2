@@ -4,7 +4,28 @@
 
 /* 日付入力フィールドの統一スタイル */
 input[type="date"] {
-  text-align: left;
+  text-align: left !important;
+  direction: ltr !important;
+}
+
+/* モバイル専用の強制左揃え */
+@media (max-width: 640px) {
+  input[type="date"] {
+    text-align: left !important;
+    direction: ltr !important;
+    -webkit-text-align-last: left !important;
+    text-align-last: left !important;
+  }
+  
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+  input[type="date"]::-webkit-datetime-edit-text,
+  input[type="date"]::-webkit-datetime-edit-year-field,
+  input[type="date"]::-webkit-datetime-edit-month-field,
+  input[type="date"]::-webkit-datetime-edit-day-field {
+    text-align: left !important;
+    direction: ltr !important;
+    justify-content: flex-start !important;
+  }
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -29,12 +50,18 @@ input[type="date"]::-webkit-datetime-edit-text,
 input[type="date"]::-webkit-datetime-edit-year-field,
 input[type="date"]::-webkit-datetime-edit-month-field,
 input[type="date"]::-webkit-datetime-edit-day-field {
-  text-align: left;
+  text-align: left !important;
+  direction: ltr !important;
 }
 
 /* Firefox用のスタイル */
 input[type="date"]::-moz-focus-inner {
   border: 0;
+}
+
+/* Firefox用の左揃え強制 */
+input[type="date"]::-moz-placeholder {
+  text-align: left !important;
 }
 
 body {
